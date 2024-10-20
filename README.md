@@ -1,4 +1,4 @@
-# 𝕐 - A Twitter Clone
+# 𝕐 - Programming Patterns Final Project
 
 𝕐 is a social media platform where users can create accounts, curate profiles by posting text-based content, follow other accounts, and view a home feed of posts from users they follow. Users can like posts and report posts or users for inappropriate content. Admins can review reports and take action by deleting posts or banning users.
 
