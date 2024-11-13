@@ -30,18 +30,4 @@ public class UserAccount extends Account {
     // TODO: public void reportAccount(UserAccount account, String reason)
 
     // TODO: public void reportPost(Post post, String reason)
-
-    public class Post {
-        private int id;
-        private String text;
-        private int likes;
-        private Date datePosted;
-
-        public Post(String text) {
-            this.id = 0;
-            this.text = text;
-            this.likes = 0;
-            // id, dateposted handled in database
-        }
-    }
 }

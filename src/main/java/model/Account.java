@@ -20,7 +20,7 @@ public abstract class Account {
     }
 
     // TODO
-    public void removePost(UserAccount.Post post) {
+    public void removePost(Post post) {
 
     }
 }
