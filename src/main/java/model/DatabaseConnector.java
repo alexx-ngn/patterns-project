@@ -2,6 +2,7 @@ package model;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Formattable;
 import java.util.List;
 
 public class DatabaseConnector {
@@ -332,11 +333,13 @@ public class DatabaseConnector {
              ResultSet resultSet = statement.executeQuery(sql))
         {
             while (resultSet.next()) {
+                int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
                 String email = resultSet.getString("email");
                 String username = resultSet.getString("username");
-                AdminAccount admin = new AdminAccount(name, email, username);
-                admins.add(admin); //How to handle ids?
+                Date creationDate = resultSet.getDate("creationDate");
+                AdminAccount admin = new AdminAccount(id, name, email, username, creationDate);
+                admins.add(admin);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -358,16 +361,102 @@ public class DatabaseConnector {
              ResultSet resultSet = statement.executeQuery(sql))
         {
             while (resultSet.next()) {
+                int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
                 String email = resultSet.getString("email");
                 String username = resultSet.getString("username");
-                UserAccount user = new UserAccount(name, email, username);
-                users.add(user); //How to handle ids and number of followers?
+                Date creationDate = resultSet.getDate("creationDate");
+                int numFollowers = resultSet.getInt("numFollowers");
+                UserAccount user = new UserAccount(id, name, email, username, creationDate, numFollowers);
+                users.add(user);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return users;
     }
-    //TODO add methods to select all posts, follows, likes, user_reports, and post_reports
+
+    /**
+     * Selects all posts from the database for a given user account
+     * @param tableName the table to select from
+     * @param account the user account to select posts for
+     * @return a list of all posts for the user account
+     */
+    public static List<Post> selectAllPosts (String tableName, UserAccount account) {
+        String sql = "SELECT * FROM " + tableName + " WHERE userId = " + account.getId();
+
+        List<Post> posts = new ArrayList<>();
+        try (Connection connection = connect(DB_PATH);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql))
+        {
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String text = resultSet.getString("text");
+                int likes = resultSet.getInt("likes");
+                Date datePosted = resultSet.getDate("datePosted");
+                Post post = new Post(id, text, likes, datePosted);
+                posts.add(post);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return posts;
+    }
+
+    /**
+     * Selects either all user reports or all post reports from the database
+     * @param tableName the table to select from
+     * @param reportClass the class of the report to select (UserReport or PostReport)
+     * @return a list of all reports
+     */
+    public static <T extends Report> List<T> selectAllReports(String tableName, Class<T> reportClass) {
+        String sql = "SELECT * FROM " + tableName;
+
+        List<T> reports = new ArrayList<>();
+        try (Connection connection = connect(DB_PATH);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql))
+        {
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String reason = resultSet.getString("reason");
+                String stringStatus = resultSet.getString("status");
+                Report.Status status = Report.Status.valueOf(stringStatus);
+                Date date = resultSet.getDate("date");
+                int adminId = resultSet.getInt("adminId");
+                int reporterId = resultSet.getInt("reporterId");
+
+                if (reportClass == UserReport.class) {
+                    int reporteeId = resultSet.getInt("reporteeId");
+                    reports.add(reportClass.cast(new UserReport(id, adminId, reporterId, status, reason, date, reporteeId)));
+                } else if (reportClass == PostReport.class) {
+                    int postId = resultSet.getInt("postId");
+                    reports.add(reportClass.cast(new PostReport(id, adminId, reporterId, status, reason, date, postId)));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return reports;
+    }
+
+    /**
+     * Selects all user reports from the database
+     * @param tableName the table to select from
+     * @return a list of all user reports
+     */
+    public static List<UserReport> selectAllUserReports(String tableName) {
+        return selectAllReports(tableName, UserReport.class);
+    }
+
+    /**
+     * Selects all post reports from the database
+     * @param tableName the table to select from
+     * @return a list of all post reports
+     */
+    public static List<PostReport> selectAllPostReports(String tableName) {
+        return selectAllReports(tableName, PostReport.class);
+    }
+    //TODO add methods to select all follows, likes
 }

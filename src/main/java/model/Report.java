@@ -18,6 +18,17 @@ public abstract class Report {
         CREATED, ASSIGNED, PROCESSING, BLOCKED, CLOSED
     }
 
+    // Constructor for Report that handles all fields, this is used for fetching data from the database and
+    // creating an object. Used for creating a list when selecting all from the database.
+    public Report(int id, int adminId, int reportingUserId, Status status, String reason, Date dateReported) {
+        this.id = id;
+        this.adminId = adminId;
+        this.reportingUserId = reportingUserId;
+        this.status = status;
+        this.reason = reason;
+        this.dateReported = dateReported;
+    }
+
     public Report(int reportingUserId, Status status, String reason) {
         this.status = status;
         this.reason = reason;
