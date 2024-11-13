@@ -1,7 +1,10 @@
 package model;
+import lombok.*;
 
 import java.sql.Date;
 
+@Getter
+@Setter
 public abstract class Account {
     private int id;
     private String name;

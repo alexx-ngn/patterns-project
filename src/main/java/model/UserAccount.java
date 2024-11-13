@@ -1,10 +1,14 @@
 package model;
 
+import lombok.*;
+
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+@Getter
+@Setter
 public class UserAccount extends Account {
     private int followerCount;
     private List<UserAccount> followers;

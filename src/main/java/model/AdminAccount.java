@@ -1,8 +1,12 @@
 package model;
 
+import lombok.*;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
+@Getter
+@Setter
 public class AdminAccount extends Account {
     private Queue<Report> assignedReports;
 

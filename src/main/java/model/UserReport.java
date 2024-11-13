@@ -1,5 +1,9 @@
 package model;
 
+import lombok.*;
+
+@Getter
+@Setter
 public class UserReport extends Report{
     private int reportedUserId;
 

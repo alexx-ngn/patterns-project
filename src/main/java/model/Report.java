@@ -1,7 +1,11 @@
 package model;
 
+import lombok.*;
+
 import java.sql.Date;
 
+@Getter
+@Setter
 public abstract class Report {
     private int id;
     private int adminId;
