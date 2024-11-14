@@ -337,11 +337,10 @@ public class DatabaseConnector {
 
     /**
      * Selects all admins from the database
-     * @param tableName the table to select from
      * @return a list of all admins
      */
-    public static List<AdminAccount> selectAllAdmins(String tableName) {
-        String sql = "SELECT * FROM " + tableName;
+    public static List<AdminAccount> selectAllAdmins() {
+        String sql = "SELECT * FROM admins";
 
         List<AdminAccount> admins = new ArrayList<>();
         try (Connection connection = connect(DB_PATH);
@@ -365,33 +364,30 @@ public class DatabaseConnector {
 
     /**
      * Selects all users from the database
-     * @param tableName the table to select from
      * @return a list of all users
      */
-    public static List<UserAccount> selectAllUsers(String tableName) {
-        String sql = "SELECT * FROM " + tableName;
+    public static List<UserAccount> selectAllUsers() {
+        String sql = "SELECT * FROM users";
         return getUserAccounts(sql);
     }
 
     /**
      * Selects a user account from the database by username
-     * @param tableName the table to select from
      * @param searchQuery the username to search for
      * @return a list of user accounts that match the search query
      */
-    public static List<UserAccount> selectUserAccountSearchResults(String tableName, String searchQuery) {
-        String sql = "SELECT * FROM " + tableName + " WHERE username LIKE '%'" + searchQuery + '%';
+    public static List<UserAccount> selectUserAccountSearchResults(String searchQuery) {
+        String sql = "SELECT * FROM users" + " WHERE username LIKE '%'" + searchQuery + '%';
         return getUserAccounts(sql);
     }
 
     /**
      * Selects all posts from the database for a given user account
-     * @param tableName the table to select from
      * @param account the user account to select posts for
      * @return a list of all posts for the user account
      */
-    public static List<Post> selectAllPosts (String tableName, UserAccount account) {
-        String sql = "SELECT * FROM " + tableName + " WHERE userId = " + account.getId();
+    public static List<Post> selectAllPosts (UserAccount account) {
+        String sql = "SELECT * FROM posts"  + " WHERE userId = " + account.getId();
 
         List<Post> posts = new ArrayList<>();
         try (Connection connection = connect(DB_PATH);
@@ -414,12 +410,16 @@ public class DatabaseConnector {
 
     /**
      * Selects either all user reports or all post reports from the database
-     * @param tableName the table to select from
      * @param reportClass the class of the report to select (UserReport or PostReport)
      * @return a list of all reports
      */
-    public static <T extends Report> List<T> selectAllReports(String tableName, Class<T> reportClass) {
-        String sql = "SELECT * FROM " + tableName;
+    public static <T extends Report> List<T> selectAllReports(Class<T> reportClass) {
+        String table = switch (reportClass.getSimpleName()) {
+            case "UserReport" -> "user_reports";
+            case "PostReport" -> "post_reports";
+            default -> throw new IllegalArgumentException("Invalid report class");
+        };
+        String sql = "SELECT * FROM " + table;
 
         List<T> reports = new ArrayList<>();
         try (Connection connection = connect(DB_PATH);
@@ -451,30 +451,27 @@ public class DatabaseConnector {
 
     /**
      * Selects all user reports from the database
-     * @param tableName the table to select from
      * @return a list of all user reports
      */
-    public static List<UserReport> selectAllUserReports(String tableName) {
-        return selectAllReports(tableName, UserReport.class);
+    public static List<UserReport> selectAllUserReports() {
+        return selectAllReports(UserReport.class);
     }
 
     /**
      * Selects all post reports from the database
-     * @param tableName the table to select from
      * @return a list of all post reports
      */
-    public static List<PostReport> selectAllPostReports(String tableName) {
-        return selectAllReports(tableName, PostReport.class);
+    public static List<PostReport> selectAllPostReports() {
+        return selectAllReports(PostReport.class);
     }
 
     /**
      * Selects all follower accounts for a given user account
-     * @param tableName the table to select from
      * @param account the user account to select followers for
      * @return a list of all follower accounts
      */
-    public static List<UserAccount> selectAllFollows(String tableName, UserAccount account) {
-        String sql = "SELECT * FROM " + tableName + " WHERE followerId = " + account.getId();
+    public static List<UserAccount> selectAllFollows(UserAccount account) {
+        String sql = "SELECT * FROM follows" + "WHERE followerId = " + account.getId();
 
         List<UserAccount> follows = new ArrayList<>();
         try (Connection connection = connect(DB_PATH);
@@ -483,7 +480,7 @@ public class DatabaseConnector {
         {
             while (resultSet.next()) {
                 int followeeId = resultSet.getInt("followeeId");
-                UserAccount followee = selectAllUsers("users").stream()
+                UserAccount followee = selectAllUsers().stream()
                         .filter(user -> user.getId() == followeeId)
                         .findFirst()
                         .orElseThrow(() -> new RuntimeException("Followee not found"));
@@ -497,12 +494,11 @@ public class DatabaseConnector {
 
     /**
      * Selects all user likes for a given post
-     * @param tableName the table to select from
      * @param post the post to select likes for
      * @return a list of all user likes
      */
-    public static List<UserAccount> selectAllUserLikesFromPost(String tableName, Post post) {
-        String sql = "SELECT * FROM " + tableName + " WHERE postId = " + post.getId();
+    public static List<UserAccount> selectAllUserLikesFromPost(Post post) {
+        String sql = "SELECT * FROM likes" + " WHERE postId = " + post.getId();
 
         List<UserAccount> likes = new ArrayList<>();
         try (Connection connection = connect(DB_PATH);
@@ -511,7 +507,7 @@ public class DatabaseConnector {
         {
             while (resultSet.next()) {
                 int userId = resultSet.getInt("userId");
-                UserAccount user = selectAllUsers("users").stream()
+                UserAccount user = selectAllUsers().stream()
                         .filter(u -> u.getId() == userId)
                         .findFirst()
                         .orElseThrow(() -> new RuntimeException("User not found"));
