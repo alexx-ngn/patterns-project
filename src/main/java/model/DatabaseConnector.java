@@ -458,5 +458,60 @@ public class DatabaseConnector {
     public static List<PostReport> selectAllPostReports(String tableName) {
         return selectAllReports(tableName, PostReport.class);
     }
-    //TODO add methods to select all follows, likes
+
+    /**
+     * Selects all follower accounts for a given user account
+     * @param tableName the table to select from
+     * @param account the user account to select followers for
+     * @return a list of all follower accounts
+     */
+    public static List<UserAccount> selectAllFollows(String tableName, UserAccount account) {
+        String sql = "SELECT * FROM " + tableName + " WHERE followerId = " + account.getId();
+
+        List<UserAccount> follows = new ArrayList<>();
+        try (Connection connection = connect(DB_PATH);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql))
+        {
+            while (resultSet.next()) {
+                int followeeId = resultSet.getInt("followeeId");
+                UserAccount followee = selectAllUsers("users").stream()
+                        .filter(user -> user.getId() == followeeId)
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Followee not found"));
+                follows.add(followee);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return follows;
+    }
+
+    /**
+     * Selects all user likes for a given post
+     * @param tableName the table to select from
+     * @param post the post to select likes for
+     * @return a list of all user likes
+     */
+    public static List<UserAccount> selectAllUserLikesFromPost(String tableName, Post post) {
+        String sql = "SELECT * FROM " + tableName + " WHERE postId = " + post.getId();
+
+        List<UserAccount> likes = new ArrayList<>();
+        try (Connection connection = connect(DB_PATH);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql))
+        {
+            while (resultSet.next()) {
+                int userId = resultSet.getInt("userId");
+                UserAccount user = selectAllUsers("users").stream()
+                        .filter(u -> u.getId() == userId)
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+                likes.add(user);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return likes;
+    }
 }
