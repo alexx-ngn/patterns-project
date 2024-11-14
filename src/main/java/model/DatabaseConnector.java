@@ -370,26 +370,18 @@ public class DatabaseConnector {
      */
     public static List<UserAccount> selectAllUsers(String tableName) {
         String sql = "SELECT * FROM " + tableName;
+        return getUserAccounts(sql);
+    }
 
-        List<UserAccount> users = new ArrayList<>();
-        try (Connection connection = connect(DB_PATH);
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql))
-        {
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("name");
-                String email = resultSet.getString("email");
-                String username = resultSet.getString("username");
-                Date creationDate = resultSet.getDate("creationDate");
-                int numFollowers = resultSet.getInt("numFollowers");
-                UserAccount user = new UserAccount(id, name, email, username, creationDate, numFollowers);
-                users.add(user);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return users;
+    /**
+     * Selects a user account from the database by username
+     * @param tableName the table to select from
+     * @param searchQuery the username to search for
+     * @return a list of user accounts that match the search query
+     */
+    public static List<UserAccount> selectUserAccountSearchResults(String tableName, String searchQuery) {
+        String sql = "SELECT * FROM " + tableName + " WHERE username LIKE '%'" + searchQuery + '%';
+        return getUserAccounts(sql);
     }
 
     /**
@@ -529,5 +521,32 @@ public class DatabaseConnector {
             throw new RuntimeException(e);
         }
         return likes;
+    }
+
+    /**
+     * Selects all user accounts in the database
+     * @param sql the SELECT statement to execute
+     * @return a list of all user accounts
+     */
+    private static List<UserAccount> getUserAccounts(String sql) {
+        List<UserAccount> searchResults = new ArrayList<>();
+        try (Connection connection = connect(DB_PATH);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql))
+        {
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                String email = resultSet.getString("email");
+                String username = resultSet.getString("username");
+                Date creationDate = resultSet.getDate("creationDate");
+                int numFollowers = resultSet.getInt("numFollowers");
+                UserAccount user = new UserAccount(id, name, email, username, creationDate, numFollowers);
+                searchResults.add(user);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return searchResults;
     }
 }
