@@ -6,6 +6,22 @@ import java.util.Formattable;
 import java.util.List;
 
 public class DatabaseConnector {
+    // Singleton instance
+    private static DatabaseConnector instance;
+
+    private DatabaseConnector() {}
+
+    public static DatabaseConnector getInstance() {
+        if (instance == null) {
+            synchronized (DatabaseConnector.class) {
+                if (instance == null) {
+                    instance = new DatabaseConnector();
+                }
+            }
+        }
+        return instance;
+    }
+
     // Path to the database file
     public static final String BASE_PATH = "jdbc:sqlite:./src/main/resources/";
     public static final String DB_PATH = BASE_PATH + "database.db";
