@@ -1,5 +1,6 @@
 package model;
 
+import controller.ReportSystem;
 import lombok.*;
 
 import java.sql.Date;
@@ -10,24 +11,69 @@ import java.util.Stack;
 @Getter
 @Setter
 public class UserAccount extends Account {
-    private int followerCount;
     private List<UserAccount> followers;
+    private int followerCount;
     private List<Post> posts;
 
     public UserAccount(String name, String email, String username) {
         super(name, email, username);
-        this.followerCount = 0;
         this.followers = new ArrayList<>();
-        this.posts = new Stack<>();
+        this.posts = new ArrayList<>();
     }
 
-    // TODO: public void follow(UserAccount account)
+    @Override
+    public void removePost(Post post) {
+        posts.remove(post); // TODO: equals method for post
+        // TODO: insert query
+    }
 
-    // TODO: public void post(String text)
+    /**
+     * follows another account and updates its followercount
+     * @param account account to be followed
+     */
+    public void follow(UserAccount account) {
+        account.getFollowers().add(this);
+        account.setFollowerCount(account.getFollowers().size());
+        // TODO: insert query
+    }
 
-    // TODO: public void like(Post post)
+    /**
+     * User creates a post and adds it to its list of posts
+     * @param text text of post
+     */
+    public void post(String text) {
+        posts.add(new Post(text));
+        // TODO: insert query
+    }
 
-    // TODO: public void reportAccount(UserAccount account, String reason)
+    /**
+     * this user likes a post
+     * @param post post to be liked
+     */
+    public void like(Post post) {
+        post.getLikes().add(this.getId());
+        // TODO: insert query
+    }
 
-    // TODO: public void reportPost(Post post, String reason)
+    /**
+     * reports an account, and sends it to openreports of reportsystem
+     * @param account account reported
+     * @param reason report reasoning
+     */
+    public void reportAccount(UserAccount account, String reason) {
+        ReportSystem reportSystem = ReportSystem.getInstance();
+        reportSystem.getOpenReports().add(new UserReport(account.getId(), Report.Status.CREATED, reason));
+        // TODO: insert query
+    }
+
+    /**
+     * reports a post, and sends it to openreports of reportsystem
+     * @param post post reported
+     * @param reason report reasoning
+     */
+    public void reportPost(Post post, String reason) {
+        ReportSystem reportSystem = ReportSystem.getInstance();
+        reportSystem.getOpenReports().add(new PostReport(post.getId(), Report.Status.CREATED, reason));
+        // TODO: insert query
+    }
 }

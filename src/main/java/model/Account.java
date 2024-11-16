@@ -5,6 +5,7 @@ import java.sql.Date;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 public abstract class Account {
     private int id;
     private String name;
@@ -19,8 +20,11 @@ public abstract class Account {
         // id and creationDate handled in database
     }
 
-    // TODO
-    public void removePost(Post post) {
-
-    }
+    /**
+     * depending on user removing post it differs:
+     * regular user: can only remove own posts
+     * admin: can remove any post
+     * @param post
+     */
+    public abstract void removePost(Post post);
 }
