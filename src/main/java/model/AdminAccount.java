@@ -23,6 +23,11 @@ public class AdminAccount extends Account {
         this.assignedReports = new LinkedList<>(); // TODO: Implement own queue for this?
     }
 
+    @Override
+    public void removePost(Post post) {
+
+    }
+
     // TODO: public void removeReport(Report ticket)
 
     // TODO: public void ban(UserAccount account)
