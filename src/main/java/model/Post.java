@@ -8,17 +8,28 @@ import java.util.Set;
 
 @Getter
 @Setter
-@AllArgsConstructor
+@EqualsAndHashCode
 public class Post {
     private int id;
+    private int userId;
     private String text;
-    private Set<Integer> likes;
+    private int likes;
+    private Set<UserAccount> usersLiked;
     private Date datePosted;
 
     public Post(String text) {
         this.id = 0;
         this.text = text;
-        this.likes = new HashSet<>();
+        this.likes = 0;
+        this.usersLiked = new HashSet<>();
         // id, dateposted handled in database
+    }
+
+    public Post(int id, int userId, String text, int likes, Date datePosted) {
+        this.id = id;
+        this.userId = userId;
+        this.text = text;
+        this.likes = likes;
+        this.usersLiked = new HashSet<>();
     }
 }

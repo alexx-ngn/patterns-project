@@ -1,6 +1,5 @@
 package model;
 
-import controller.ReportSystem;
 import lombok.*;
 
 import java.sql.Date;
@@ -17,23 +16,22 @@ public class UserAccount extends Account {
 
     // Constructor for UserAccount that handles all fields, this is used for fetching data from the database and
     // creating an object. Used for creating a list when selecting all from the database.
-    public UserAccount(int id, String name, String email, String username, Date creationDate, int followerCount) {
-        super(id, name, email, username, creationDate);
+    public UserAccount(int id, String name, String email, String username, String password, Date creationDate, int followerCount) {
+        super(id, name, email, username, password, creationDate);
         this.followerCount = followerCount;
         this.followers = new ArrayList<>();
         this.posts = new Stack<>();
     }
 
-    public UserAccount(String name, String email, String username) {
-        super(name, email, username);
+    public UserAccount(String name, String email, String username, String password) {
+        super(name, email, username, password);
         this.followers = new ArrayList<>();
         this.posts = new ArrayList<>();
     }
 
     @Override
     public void removePost(Post post) {
-        posts.remove(post); // TODO: equals method for post
-        // TODO: insert query
+        posts.remove(post);
     }
 
     /**
@@ -42,26 +40,17 @@ public class UserAccount extends Account {
      */
     public void follow(UserAccount account) {
         account.getFollowers().add(this);
-        account.setFollowerCount(account.getFollowers().size());
-        // TODO: insert query
+        account.setFollowerCount(account.getFollowers().size()); // Update follower count of followed account
     }
 
     /**
      * User creates a post and adds it to its list of posts
      * @param text text of post
      */
-    public void post(String text) {
-        posts.add(new Post(text));
-        // TODO: insert query
-    }
-
-    /**
-     * this user likes a post
-     * @param post post to be liked
-     */
-    public void like(Post post) {
-        post.getLikes().add(this.getId());
-        // TODO: insert query
+    public Post post(String text) {
+        Post post = new Post(text);
+        posts.add(post);
+        return post;
     }
 
     /**
@@ -69,10 +58,8 @@ public class UserAccount extends Account {
      * @param account account reported
      * @param reason report reasoning
      */
-    public void reportAccount(UserAccount account, String reason) {
-        ReportSystem reportSystem = ReportSystem.getInstance();
-        reportSystem.getOpenReports().add(new UserReport(account.getId(), Report.Status.CREATED, reason));
-        // TODO: insert query
+    public UserReport reportAccount(UserAccount account, String reason) {
+        return new UserReport(account.getId(), Report.Status.CREATED, reason);
     }
 
     /**
@@ -80,9 +67,7 @@ public class UserAccount extends Account {
      * @param post post reported
      * @param reason report reasoning
      */
-    public void reportPost(Post post, String reason) {
-        ReportSystem reportSystem = ReportSystem.getInstance();
-        reportSystem.getOpenReports().add(new PostReport(post.getId(), Report.Status.CREATED, reason));
-        // TODO: insert query
+    public PostReport reportPost(Post post, String reason) {
+        return new PostReport(post.getId(), Report.Status.CREATED, reason);
     }
 }
