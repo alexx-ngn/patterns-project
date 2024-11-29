@@ -1,24 +1,26 @@
-package model;
+package controller;
+
+import model.*;
 
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class DatabaseConnector {
+public class DatabaseController {
     // Singleton instance
-    private static DatabaseConnector instance;
+    private static DatabaseController instance;
     private static ReentrantReadWriteLock LOCK = new ReentrantReadWriteLock();
     private static ReentrantReadWriteLock.ReadLock READ_LOCK = LOCK.readLock();
     private static ReentrantReadWriteLock.WriteLock WRITE_LOCK = LOCK.writeLock();
 
-    private DatabaseConnector() {}
+    private DatabaseController() {}
 
-    public static DatabaseConnector getInstance() {
+    public static DatabaseController getInstance() {
         if (instance == null) {
-            synchronized (DatabaseConnector.class) {
+            synchronized (DatabaseController.class) {
                 if (instance == null) {
-                    instance = new DatabaseConnector();
+                    instance = new DatabaseController();
                 }
             }
         }
