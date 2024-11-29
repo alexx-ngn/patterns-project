@@ -266,6 +266,37 @@ public class DatabaseConnector {
     }
 
     /**
+     * Takes all parameters for insert (usage for many-to-many tables)
+     * @param tableName name of table
+     * @param params values to insert
+     * @return INSERT statement
+     */
+    public static String generateFullInsertStatement(String tableName, Object... params) {
+        StringBuilder sb = new StringBuilder("INSERT INTO "); // Start building the INSERT statement
+
+        sb.append(tableName).append(" VALUES("); // Append the table name and VALUES keyword
+
+        for (int i = 0; i < params.length; i++) {
+            Object value = params[i];
+            if (i < params.length - 1) { // Append values with a comma
+                if (value instanceof String) {
+                    sb.append("'").append(value).append("', ");
+                } else {
+                    sb.append(value).append(", ");
+                }
+            } else { // Append the last value without a comma
+                if (value instanceof String) {
+                    sb.append("'").append(value).append("'");
+                } else {
+                    sb.append(value);
+                }
+            }
+        }
+        sb.append(")"); // Close the VALUES clause
+        return sb.toString(); // Return the complete INSERT statement
+    }
+
+    /**
      * Get the column names of a table
      * @param tableName the name of the table
      * @return an array of column names
@@ -492,10 +523,11 @@ public class DatabaseConnector {
         {
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
+                int userId = resultSet.getInt("userId");
                 String text = resultSet.getString("text");
                 int likes = resultSet.getInt("likes");
                 Date datePosted = resultSet.getDate("datePosted");
-                Post post = new Post(id, text, likes, datePosted);
+                Post post = new Post(id, userId, text, likes, datePosted);
                 posts.add(post);
             }
         } catch (SQLException e) {
