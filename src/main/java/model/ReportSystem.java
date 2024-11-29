@@ -1,12 +1,9 @@
-package controller;
+package model;
 
+import controller.DatabaseController;
 import lombok.Getter;
 import lombok.Setter;
-import model.AdminAccount;
-import model.Report;
-import model.UserAccount;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -14,18 +11,15 @@ import java.util.Queue;
 @Getter
 @Setter
 public class ReportSystem {
-    private static ReportSystem instance;
-    private List<UserAccount> userAccounts;
     private List<AdminAccount> adminAccounts;
     private Queue<Report> openReports;
-    private Queue<Report> processingReports;
     private List<Report> closedReports;
 
+    private static ReportSystem instance;
+
     private ReportSystem() {
-        this.userAccounts = new ArrayList<>();
-        this.adminAccounts = new ArrayList<>();
+        this.adminAccounts = DatabaseController.selectAllAdmins();
         this.openReports = new LinkedList<>();
-        this.processingReports = new LinkedList<>();
         this.closedReports = new LinkedList<>();
     }
 
@@ -40,16 +34,5 @@ public class ReportSystem {
         return instance;
     }
 
-    public void addUser(UserAccount userAccount) {
-        userAccounts.add(userAccount);
-    }
-
-    public void addAdmin(AdminAccount adminAccount) {
-        adminAccounts.add(adminAccount);
-    }
-
-    // TODO: database method
-    public void searchReport(String keyword) {
-
-    }
+    // TODO: validate Admin credentials
 }
