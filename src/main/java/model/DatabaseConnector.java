@@ -1,13 +1,16 @@
 package model;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Formattable;
-import java.util.List;
+import java.sql.Date;
+import java.util.*;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DatabaseConnector {
     // Singleton instance
     private static DatabaseConnector instance;
+    private static ReentrantReadWriteLock LOCK = new ReentrantReadWriteLock();
+    private static ReentrantReadWriteLock.ReadLock READ_LOCK = LOCK.readLock();
+    private static ReentrantReadWriteLock.WriteLock WRITE_LOCK = LOCK.writeLock();
 
     private DatabaseConnector() {}
 
@@ -205,11 +208,14 @@ public class DatabaseConnector {
      * @param sql the statement to execute
      */
     private static void executeDdlAndDml(String sql) {
+        WRITE_LOCK.lock();
         try (Connection connection = connect(DB_PATH);
              Statement statement = connection.createStatement()) {
             statement.executeUpdate(sql);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            WRITE_LOCK.unlock();
         }
     }
 
@@ -220,9 +226,24 @@ public class DatabaseConnector {
      * @return the INSERT statement
      */
     public static String generateInsertStatement(String tableName, Object... params) {
-        StringBuilder sb = new StringBuilder("INSERT INTO "); // Start building the INSERT statement
+        String[] columns = getColumns(tableName);
 
-        sb.append(tableName).append(" VALUES("); // Append the table name and VALUES keyword
+        if (columns.length - 1 != params.length) {
+            throw new IllegalArgumentException("The number of columns must match the number of parameters.");
+        }
+
+        StringBuilder sb = new StringBuilder("INSERT INTO ");
+        sb.append(tableName).append(" (");
+
+        // Append column names, starting from the second column because the first column is the ID
+        for (int i = 1; i < columns.length; i++) {
+            sb.append(columns[i]);
+            if (i < columns.length - 1) {
+                sb.append(", ");
+            }
+        }
+
+        sb.append(") VALUES("); // Append the table name and VALUES keyword
 
         for (int i = 0; i < params.length; i++) {
             Object value = params[i];
@@ -242,6 +263,44 @@ public class DatabaseConnector {
         }
         sb.append(")"); // Close the VALUES clause
         return sb.toString(); // Return the complete INSERT statement
+    }
+
+    /**
+     * Get the column names of a table
+     * @param tableName the name of the table
+     * @return an array of column names
+     */
+    private static String[] getColumns(String tableName) {
+        READ_LOCK.lock();
+        // SQLite database path and table name
+        try (Connection conn = connect(DB_PATH)) {
+            // Query to fetch one row from the table
+            String query = "SELECT * FROM " + tableName + " LIMIT 1";
+
+            // Execute the query and retrieve metadata
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(query)) {
+
+                // Get the ResultSetMetaData
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
+                // Create an array to hold the column names
+                String[] columnNames = new String[columnCount];
+
+                // Loop through the columns and get their names
+                for (int i = 1; i <= columnCount; i++) {
+                    columnNames[i - 1] = metaData.getColumnName(i);
+                }
+
+                return columnNames;
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL error: " + e.getMessage());
+            return null;
+        } finally {
+            READ_LOCK.unlock();
+        }
     }
 
     /**
@@ -340,6 +399,7 @@ public class DatabaseConnector {
      * @return a list of all admins
      */
     public static List<AdminAccount> selectAllAdmins() {
+        READ_LOCK.lock();
         String sql = "SELECT * FROM admins";
 
         List<AdminAccount> admins = new ArrayList<>();
@@ -358,8 +418,41 @@ public class DatabaseConnector {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            READ_LOCK.unlock();
         }
         return admins;
+    }
+
+    /**
+     * Selects all user accounts in the database
+     * @param sql the SELECT statement to execute
+     * @return a list of all user accounts
+     */
+    private static List<UserAccount> getUserAccounts(String sql) {
+        READ_LOCK.lock();
+        List<UserAccount> searchResults = new ArrayList<>();
+
+        try (Connection connection = connect(DB_PATH);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql))
+        {
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                String email = resultSet.getString("email");
+                String username = resultSet.getString("username");
+                Date creationDate = resultSet.getDate("creationDate");
+                int numFollowers = resultSet.getInt("numFollowers");
+                UserAccount user = new UserAccount(id, name, email, username, creationDate, numFollowers);
+                searchResults.add(user);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            READ_LOCK.unlock();
+        }
+        return searchResults;
     }
 
     /**
@@ -387,6 +480,7 @@ public class DatabaseConnector {
      * @return a list of all posts for the user account
      */
     public static List<Post> selectAllPosts (UserAccount account) {
+        READ_LOCK.lock();
         String sql = "SELECT * FROM posts"  + " WHERE userId = " + account.getId();
 
         List<Post> posts = new ArrayList<>();
@@ -404,6 +498,8 @@ public class DatabaseConnector {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            READ_LOCK.unlock();
         }
         return posts;
     }
@@ -414,6 +510,7 @@ public class DatabaseConnector {
      * @return a list of all reports
      */
     public static <T extends Report> List<T> selectAllReports(Class<T> reportClass) {
+        READ_LOCK.lock();
         String table = switch (reportClass.getSimpleName()) {
             case "UserReport" -> "user_reports";
             case "PostReport" -> "post_reports";
@@ -445,6 +542,8 @@ public class DatabaseConnector {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            READ_LOCK.unlock();
         }
         return reports;
     }
@@ -471,6 +570,7 @@ public class DatabaseConnector {
      * @return a list of all follower accounts
      */
     public static List<UserAccount> selectAllFollows(UserAccount account) {
+        READ_LOCK.lock();
         String sql = "SELECT * FROM follows" + "WHERE followerId = " + account.getId();
 
         List<UserAccount> follows = new ArrayList<>();
@@ -488,6 +588,8 @@ public class DatabaseConnector {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            READ_LOCK.unlock();
         }
         return follows;
     }
@@ -495,12 +597,13 @@ public class DatabaseConnector {
     /**
      * Selects all user likes for a given post
      * @param post the post to select likes for
-     * @return a list of all user likes
+     * @return a set of all user likes (unique)
      */
-    public static List<UserAccount> selectAllUserLikesFromPost(Post post) {
+    public static Set<UserAccount> selectAllUserLikesFromPost(Post post) {
+        READ_LOCK.lock();
         String sql = "SELECT * FROM likes" + " WHERE postId = " + post.getId();
 
-        List<UserAccount> likes = new ArrayList<>();
+        Set<UserAccount> likes = new HashSet<>();
         try (Connection connection = connect(DB_PATH);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql))
@@ -515,34 +618,9 @@ public class DatabaseConnector {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            READ_LOCK.unlock();
         }
         return likes;
-    }
-
-    /**
-     * Selects all user accounts in the database
-     * @param sql the SELECT statement to execute
-     * @return a list of all user accounts
-     */
-    private static List<UserAccount> getUserAccounts(String sql) {
-        List<UserAccount> searchResults = new ArrayList<>();
-        try (Connection connection = connect(DB_PATH);
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql))
-        {
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("name");
-                String email = resultSet.getString("email");
-                String username = resultSet.getString("username");
-                Date creationDate = resultSet.getDate("creationDate");
-                int numFollowers = resultSet.getInt("numFollowers");
-                UserAccount user = new UserAccount(id, name, email, username, creationDate, numFollowers);
-                searchResults.add(user);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return searchResults;
     }
 }
