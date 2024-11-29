@@ -412,8 +412,9 @@ public class DatabaseConnector {
                 String name = resultSet.getString("name");
                 String email = resultSet.getString("email");
                 String username = resultSet.getString("username");
+                String password = resultSet.getString("password");
                 Date creationDate = resultSet.getDate("creationDate");
-                AdminAccount admin = new AdminAccount(id, name, email, username, creationDate);
+                AdminAccount admin = new AdminAccount(id, name, email, username, password, creationDate);
                 admins.add(admin);
             }
         } catch (SQLException e) {
@@ -442,9 +443,10 @@ public class DatabaseConnector {
                 String name = resultSet.getString("name");
                 String email = resultSet.getString("email");
                 String username = resultSet.getString("username");
+                String password = resultSet.getString("password");
                 Date creationDate = resultSet.getDate("creationDate");
                 int numFollowers = resultSet.getInt("numFollowers");
-                UserAccount user = new UserAccount(id, name, email, username, creationDate, numFollowers);
+                UserAccount user = new UserAccount(id, name, email, username, password, creationDate, numFollowers);
                 searchResults.add(user);
             }
         } catch (SQLException e) {
