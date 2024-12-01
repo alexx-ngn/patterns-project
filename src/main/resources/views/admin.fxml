@@ -17,26 +17,21 @@
     
     <!-- Left Sidebar -->
     <left>
-        <VBox prefHeight="630.0" prefWidth="131.0" spacing="15" style="-fx-background-color: #FFFFFF; -fx-padding: 15;">
-         <Label fx:id="YLabel" alignment="CENTER" prefHeight="142.0" prefWidth="110.0" text="𝕐">
+        <VBox prefHeight="630.0" prefWidth="152.0" spacing="15" style="-fx-background-color: #FFFFFF; -fx-padding: 15;">
+         <Label fx:id="YLabel" alignment="CENTER" prefHeight="142.0" prefWidth="128.0" text="𝕐">
             <font>
                <Font size="96.0" />
             </font>
          </Label>
-         <Label fx:id="welcomeLabel" prefHeight="63.0" prefWidth="106.0" text="%welcome.label" textAlignment="CENTER" wrapText="true">
+         <Label fx:id="welcomeLabel" prefHeight="63.0" prefWidth="136.0" text="%welcome.label" textAlignment="CENTER" wrapText="true">
             <font>
                <Font size="16.0" />
             </font>
          </Label>
-         <Button fx:id="postButton" mnemonicParsing="false" prefHeight="47.0" prefWidth="78.0" text="%post.button">
-            <font>
-               <Font name="System Bold" size="16.0" />
-            </font>
-         </Button>
-            <Button fx:id="homeButton" text="%home.button" />
-         <Button fx:id="searchButton" mnemonicParsing="false" text="%search.button" />
-            <Button fx:id="profileButton" text="%profile.button" />
-         <Button fx:id="logoutButton" alignment="CENTER" mnemonicParsing="false" text="%logout.button" />
+            <Button fx:id="openReportsButton" prefHeight="26.0" prefWidth="156.0" text="%openReports.button" />
+         <Button fx:id="closedReportsButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="132.0" text="%closedReports.button" />
+            <Button fx:id="searchButton" prefHeight="26.0" prefWidth="136.0" text="%search.button" />
+         <Button fx:id="logoutButton" alignment="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="153.0" text="%logout.button" />
         </VBox>
     </left>
 
@@ -44,7 +39,7 @@
     <center>
       <TabPane prefHeight="200.0" prefWidth="1206.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
-          <Tab id="homeTab" text="Home">
+          <Tab id="homeTab" text="Open Reports">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -52,83 +47,30 @@
                           <content>
                             <AnchorPane>
                                  <children>
-                                    <VBox>
+                                    <HBox prefHeight="598.0" prefWidth="1159.0" spacing="100.0">
                                        <children>
-                                                <Label fx:id="overviewLabel" text="%overview.label">
-                                                    <font>
-                                                        <Font size="42.0" />
-                                                    </font>
-                                                </Label>
-                                                <VBox style="-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;">
-                                                    <children>
-                                                        <Label prefHeight="18.0" prefWidth="160.0" text="USERNAME - DATE POSTED">
-                                                        <font>
-                                                            <Font name="System Bold" size="12.0" />
-                                                        </font>
-                                                        </Label>
-                                                        <Label prefHeight="150.0" prefWidth="1123.0" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." wrapText="true" />
-                                                        <HBox alignment="CENTER_RIGHT" prefHeight="35.0" prefWidth="1134.0">
-                                                        <children>
-                                                      <Label style="-fx-padding: 10;" text="0" />
-                                                            <Button mnemonicParsing="false" text="👍" />
-                                                            <Button mnemonicParsing="false" text="⚠" />
-                                                        </children>
-                                                        </HBox>
-                                                    </children>
-                                                </VBox>
-                                          <VBox style="-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;">
+                                          <VBox prefHeight="598.0" prefWidth="500.0">
                                              <children>
-                                                <Label prefHeight="18.0" prefWidth="160.0" text="USERNAME - DATE POSTED">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                </Label>
-                                                <Label prefHeight="150.0" prefWidth="1123.0" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." wrapText="true" />
-                                                <HBox alignment="CENTER_RIGHT" prefHeight="35.0" prefWidth="1134.0">
-                                                   <children>
-                                                      <Label style="-fx-padding: 10;" text="0" />
-                                                      <Button mnemonicParsing="false" text="👍" />
-                                                      <Button mnemonicParsing="false" text="⚠" />
-                                                   </children>
-                                                </HBox>
+                                                      <Label fx:id="openPostReportsLabel" text="%openPostReports.label">
+                                                          <font>
+                                                              <Font size="32.0" />
+                                                          </font>
+                                                      </Label>
+                                                <ListView fx:id="openPostReportsListView" prefHeight="533.0" prefWidth="508.0" />
                                              </children>
                                           </VBox>
-                                          <VBox style="-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;">
+                                          <VBox>
                                              <children>
-                                                <Label prefHeight="18.0" prefWidth="160.0" text="USERNAME - DATE POSTED">
+                                                <Label fx:id="openUserReportslabel" text="%openUserReports.label">
                                                    <font>
-                                                      <Font name="System Bold" size="12.0" />
+                                                      <Font size="32.0" />
                                                    </font>
                                                 </Label>
-                                                <Label prefHeight="150.0" prefWidth="1123.0" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." wrapText="true" />
-                                                <HBox alignment="CENTER_RIGHT" prefHeight="35.0" prefWidth="1134.0">
-                                                   <children>
-                                                      <Label style="-fx-padding: 10;" text="0" />
-                                                      <Button mnemonicParsing="false" text="👍" />
-                                                      <Button mnemonicParsing="false" text="⚠" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </VBox>
-                                          <VBox style="-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;">
-                                             <children>
-                                                <Label prefHeight="18.0" prefWidth="160.0" text="USERNAME - DATE POSTED">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                </Label>
-                                                <Label prefHeight="150.0" prefWidth="1123.0" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." wrapText="true" />
-                                                <HBox alignment="CENTER_RIGHT" prefHeight="35.0" prefWidth="1134.0">
-                                                   <children>
-                                                      <Label style="-fx-padding: 10;" text="0" />
-                                                      <Button mnemonicParsing="false" text="👍" />
-                                                      <Button mnemonicParsing="false" text="⚠" />
-                                                   </children>
-                                                </HBox>
+                                                <ListView fx:id="openUserReportsListView" prefHeight="534.0" prefWidth="500.0" />
                                              </children>
                                           </VBox>
                                        </children>
-                                    </VBox>
+                                    </HBox>
                                  </children>
                               </AnchorPane>
                           </content>
@@ -137,6 +79,46 @@
                   </AnchorPane>
             </content>
           </Tab>
+            <Tab id="homeTab" text="Closed Reports">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ScrollPane prefHeight="596.0" prefWidth="1187.0">
+                           <content>
+                              <AnchorPane>
+                                 <children>
+                                    <HBox prefHeight="598.0" prefWidth="1159.0" spacing="100.0">
+                                       <children>
+                                          <VBox prefHeight="598.0" prefWidth="500.0">
+                                             <children>
+                                                <Label fx:id="closedPostReportsLabel" text="%closedPostReports.label">
+                                                   <font>
+                                                      <Font size="32.0" />
+                                                   </font>
+                                                </Label>
+                                                <ListView fx:id="closedPostReportsListView" prefHeight="533.0" prefWidth="508.0" />
+                                             </children>
+                                          </VBox>
+                                          <VBox>
+                                             <children>
+                                                <Label fx:id="closedUserReportsLabel" text="%closedUserReports.label">
+                                                   <font>
+                                                      <Font size="32.0" />
+                                                   </font>
+                                                </Label>
+                                                <ListView fx:id="closedUserReportsListView" prefHeight="534.0" prefWidth="500.0" />
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </AnchorPane>
+                           </content>
+                        </ScrollPane>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
           <Tab id="searchTab" text="Search">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
@@ -168,99 +150,6 @@
                      </children></AnchorPane>
             </content>
           </Tab>
-            <Tab id="profileTab" text="My Profile">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <ScrollPane prefHeight="596.0" prefWidth="1187.0">
-                           <content>
-                              <AnchorPane>
-                                 <children>
-                                    <VBox>
-                                       <children>
-                                          <Label fx:id="postsLabel" text="%myPosts.label">
-                                             <font>
-                                                <Font size="42.0" />
-                                             </font>
-                                          </Label>
-                                          <VBox style="-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;">
-                                             <children>
-                                                <Label prefHeight="18.0" prefWidth="160.0" text="DATE POSTED">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                </Label>
-                                                <Label prefHeight="150.0" prefWidth="1123.0" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." wrapText="true" />
-                                                <HBox alignment="CENTER_RIGHT" prefHeight="35.0" prefWidth="1134.0">
-                                                   <children>
-                                                      <Label style="-fx-padding: 10;" text="0" />
-                                                      <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="32.0" text="👍" />
-                                                      <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="32.0" text="🗑" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </VBox>
-                                          <VBox style="-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;">
-                                             <children>
-                                                <Label prefHeight="18.0" prefWidth="160.0" text="DATE POSTED">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                </Label>
-                                                <Label prefHeight="150.0" prefWidth="1123.0" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." wrapText="true" />
-                                                <HBox alignment="CENTER_RIGHT" prefHeight="35.0" prefWidth="1134.0">
-                                                   <children>
-                                                      <Label style="-fx-padding: 10;" text="0" />
-                                                      <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="32.0" text="👍" />
-                                                      <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="32.0" text="🗑" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </VBox>
-                                          <VBox style="-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;">
-                                             <children>
-                                                <Label prefHeight="18.0" prefWidth="160.0" text="DATE POSTED">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                </Label>
-                                                <Label prefHeight="150.0" prefWidth="1123.0" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." wrapText="true" />
-                                                <HBox alignment="CENTER_RIGHT" prefHeight="35.0" prefWidth="1134.0">
-                                                   <children>
-                                                      <Label style="-fx-padding: 10;" text="0" />
-                                                      <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="32.0" text="👍" />
-                                                      <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="32.0" text="🗑" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </VBox>
-                                          <VBox style="-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;">
-                                             <children>
-                                                <Label prefHeight="18.0" prefWidth="160.0" text="DATE POSTED">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                </Label>
-                                                <Label prefHeight="150.0" prefWidth="1123.0" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." wrapText="true" />
-                                                <HBox alignment="CENTER_RIGHT" prefHeight="35.0" prefWidth="1134.0">
-                                                   <children>
-                                                      <Label style="-fx-padding: 10;" text="0" />
-                                                      <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="32.0" text="👍" />
-                                                      <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="32.0" text="🗑" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </VBox>
-                                       </children>
-                                    </VBox>
-                                 </children>
-                              </AnchorPane>
-                           </content>
-                        </ScrollPane>
-                     </children>
-                  </AnchorPane>
-              </content>
-            </Tab>
         </tabs>
       </TabPane>
     </center>
