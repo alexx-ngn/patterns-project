@@ -5,14 +5,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class Y extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        ResourceBundle bundle = ResourceBundle.getBundle("lang/Login");
-        FXMLLoader fxmlLoader = new FXMLLoader(Y.class.getResource("fxml/login.fxml"), bundle);
+        ResourceBundle bundle = ResourceBundle.getBundle("lang/User");
+        FXMLLoader fxmlLoader = new FXMLLoader(Y.class.getResource("fxml/user.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load());
         stage.setScene(scene);
         stage.show();
