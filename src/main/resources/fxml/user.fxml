@@ -28,15 +28,15 @@
                <Font size="16.0" />
             </font>
          </Label>
-         <Button fx:id="postButton" mnemonicParsing="false" prefHeight="47.0" prefWidth="78.0" text="%post.button">
+         <Button fx:id="postButton" mnemonicParsing="false" prefHeight="47.0" prefWidth="131.0" text="%post.button">
             <font>
                <Font name="System Bold" size="16.0" />
             </font>
          </Button>
-            <Button fx:id="homeButton" text="%home.button" />
-         <Button fx:id="searchButton" mnemonicParsing="false" text="%search.button" />
-            <Button fx:id="profileButton" text="%profile.button" />
-         <Button fx:id="logoutButton" alignment="CENTER" mnemonicParsing="false" text="%logout.button" />
+            <Button fx:id="homeButton" prefHeight="26.0" prefWidth="107.0" text="%home.button" />
+         <Button fx:id="searchButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="150.0" text="%search.button" />
+            <Button fx:id="profileButton" prefHeight="26.0" prefWidth="140.0" text="%profile.button" />
+         <Button fx:id="logoutButton" alignment="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="128.0" text="%logout.button" />
         </VBox>
     </left>
 
