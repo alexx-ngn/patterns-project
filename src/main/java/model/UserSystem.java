@@ -10,11 +10,13 @@ import java.util.List;
 @Setter
 public class UserSystem {
     private List<UserAccount> userAccounts;
+    private List<Post> posts;
 
     private static UserSystem instance;
 
     public UserSystem() {
         this.userAccounts = DatabaseController.selectAllUsers();
+        this.posts = DatabaseController.selectAllPosts();
     }
 
     public static UserSystem getInstance() {

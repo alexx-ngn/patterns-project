@@ -510,6 +510,36 @@ public class DatabaseController {
     }
 
     /**
+     * Selects all posts from the database
+     * @return a list of all posts for the user account
+     */
+    public static List<Post> selectAllPosts () {
+        READ_LOCK.lock();
+        String sql = "SELECT * FROM posts";
+
+        List<Post> posts = new ArrayList<>();
+        try (Connection connection = connect(DB_PATH);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql))
+        {
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                int userId = resultSet.getInt("userId");
+                String text = resultSet.getString("text");
+                int likes = resultSet.getInt("likes");
+                Date datePosted = resultSet.getDate("datePosted");
+                Post post = new Post(id, userId, text, likes, datePosted);
+                posts.add(post);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            READ_LOCK.unlock();
+        }
+        return posts;
+    }
+
+    /**
      * Selects all posts from the database for a given user account
      * @param account the user account to select posts for
      * @return a list of all posts for the user account
