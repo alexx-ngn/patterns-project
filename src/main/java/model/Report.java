@@ -15,7 +15,7 @@ public abstract class Report {
     private Date dateReported;
 
     public enum Status {
-        CREATED, ASSIGNED, PROCESSING, BLOCKED, CLOSED
+        CREATED, ASSIGNED, PROCESSING, BLOCKED, CLOSED // TODO: Remove everything except CREATED and CLOSED?
     }
 
     // Constructor for Report that handles all fields, this is used for fetching data from the database and
