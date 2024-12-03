@@ -1,5 +1,6 @@
 package controller;
 
+import model.AdminAccount;
 import model.Post;
 import model.UserAccount;
 import model.UserSystem;
@@ -27,6 +28,7 @@ public class UserSystemController {
     public void userRemovePost(UserAccount userAccount, Post post) {
         threadPool.submit(() -> {
             userAccount.removePost(post);
+            userSystem.getPosts().remove(post);
             String sql = DatabaseController.generateDeleteStatement("posts", "id", post.getId());
             DatabaseController.deleteRecord(sql);
         });
@@ -43,6 +45,7 @@ public class UserSystemController {
     public void userPost(UserAccount userAccount, String text) {
         threadPool.submit(() -> {
             Post post = userAccount.post(text);
+            userSystem.getPosts().add(post);
             String sql = DatabaseController.generateInsertStatement("posts", post.getUserId(), post.getText(), post.getUsersLiked());
             DatabaseController.insertRecord(sql);
         });
@@ -56,6 +59,22 @@ public class UserSystemController {
 
             // Update usersLiked property of the post
             post.setUsersLiked(DatabaseController.selectAllUserLikesFromPost(post));
+        });
+    }
+
+    public void adminRemovePost(Post post) {
+        threadPool.submit(() -> {
+            userSystem.getPosts().remove(post);
+            String sql = DatabaseController.generateDeleteStatement("posts", "id", post.getId());
+            DatabaseController.deleteRecord(sql);
+        });
+    }
+
+    public void adminBanUser(AdminAccount adminAccount, UserAccount userAccount) {
+        threadPool.submit(() -> {
+            userSystem.getUserAccounts().remove(userAccount);
+            String sql = DatabaseController.generateDeleteStatement("post_reports", "id", userAccount.getId());
+            DatabaseController.deleteRecord(sql);
         });
     }
 }

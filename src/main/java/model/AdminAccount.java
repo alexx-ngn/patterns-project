@@ -25,18 +25,33 @@ public class AdminAccount extends Account {
 
     @Override
     public void removePost(Post post) {
-
+        // TODO: not needed? Because all that must be done is for the post to be removed from UserSystem an DB,
+        //  so admin doesn't really have to do anything
     }
 
-    // TODO: public void removeReport(Report ticket)
+    public void removeReport(Report report) {
+        assignedReports.remove(report);
+    }
 
-    // TODO: public void ban(UserAccount account)
+    public void ban(UserAccount account) {
+        // TODO: again all is done thru UserSystemeController so idk man
+    }
 
-    // TODO: public void fetchNewReport(), *** shouldn't it be void since it'll just add a report to this.assignedReports
+    public void fetchNewReport(Report report) {
+        // TODO: I don't think we need this method because everything is done through GUI for admin,
+    }
 
-    // TODO: public void changeReportStatus(Report report, Status status)
+    public void changeReportStatus(Report report, Report.Status status) {
+        report.setStatus(status);
+    }
 
-    // TODO: public void assignReportTo(AdminAccount admin, Report report)
+    public void assignReportTo(AdminAccount admin, Report report) {
+        assignedReports.remove(report);
+        admin.getAssignedReports().add(report);
+    }
 
-    // TODO: public void closeReport(Report report)
+    public void closeReport(Report report) {
+        changeReportStatus(report, Report.Status.CLOSED);
+        removeReport(report);
+    }
 }
