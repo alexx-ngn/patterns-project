@@ -1,5 +1,6 @@
 package controller;
 
+import lombok.Getter;
 import model.Post;
 import model.UserAccount;
 import model.UserSystem;
@@ -7,12 +8,26 @@ import model.UserSystem;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Getter
 public class UserSystemController {
     private UserSystem userSystem;
     private static ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
-    public UserSystemController() {
+    private static UserSystemController instance;
+
+    private UserSystemController() {
         userSystem = UserSystem.getInstance();
+    }
+
+    public static UserSystemController getInstance() {
+        if (instance == null) {
+            synchronized (UserSystemController.class) {
+                if (instance == null) {
+                    instance = new UserSystemController();
+                }
+            }
+        }
+        return instance;
     }
 
     public void addUser(UserAccount userAccount) {

@@ -13,8 +13,21 @@ public class ReportSystemController {
     private ReportSystem reportSystem;
     private static ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
-    public ReportSystemController() {
+    private static ReportSystemController instance;
+
+    private ReportSystemController() {
         reportSystem = ReportSystem.getInstance();
+    }
+
+    public static ReportSystemController getInstance() {
+        if (instance == null) {
+            synchronized (ReportSystemController.class) {
+                if (instance == null) {
+                    instance = new ReportSystemController();
+                }
+            }
+        }
+        return instance;
     }
 
     public void addAdmin(AdminAccount adminAccount) {
