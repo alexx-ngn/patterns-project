@@ -137,7 +137,7 @@
                   </AnchorPane>
             </content>
           </Tab>
-          <Tab id="searchTab" text="Search">
+          <Tab id="searchTab" text="search.label">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
