@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
@@ -17,23 +16,23 @@
             <Font size="108.0" />
          </font>
       </Label>
-      <Label fx:id="usernameLabel" layoutX="311.0" layoutY="139.0" text="%username.label">
+      <Label fx:id="usernameLabel" layoutX="310.0" layoutY="270.0" text="%username.label">
          <font>
             <Font size="20.0" />
          </font>
       </Label>
-      <Label fx:id="passwordLabel" layoutX="311.0" layoutY="323.0" text="%password.label">
+      <Label fx:id="passwordLabel" layoutX="310.0" layoutY="335.0" text="%password.label">
          <font>
             <Font size="20.0" />
          </font>
       </Label>
-      <TextField fx:id="usernameTextField" layoutX="311.0" layoutY="169.0">
+      <TextField fx:id="usernameTextField" layoutX="310.0" layoutY="300.0">
          <font>
             <Font size="16.0" />
          </font>
       </TextField>
-      <Button fx:id="registerButton" layoutX="430.0" layoutY="416.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="74.0" text="%register.button" />
-      <Hyperlink fx:id="loginLink" layoutX="311.0" layoutY="387.0" onAction="#handleLoginLink" text="%login.link" />
+      <Button fx:id="registerButton" layoutX="435.0" layoutY="422.0" mnemonicParsing="false" onAction="#handleRegisterButton" prefHeight="25.0" prefWidth="74.0" text="%register.button" />
+      <Hyperlink fx:id="loginLink" layoutX="310.0" layoutY="399.0" onAction="#handleLoginLink" text="%login.link" />
       <Label fx:id="emailLabel" layoutX="311.0" layoutY="205.0" text="%email.label">
          <font>
             <Font size="20.0" />
@@ -44,17 +43,21 @@
             <Font size="16.0" />
          </font>
       </TextField>
-      <DatePicker fx:id="dateBirthDatePicker" layoutX="311.0" layoutY="301.0" prefHeight="25.0" prefWidth="199.0" />
-      <Label fx:id="dateBirthLabel" layoutX="311.0" layoutY="271.0" text="%dateBirth.label">
-         <font>
-            <Font size="20.0" />
-         </font>
-      </Label>
-      <ComboBox fx:id="languageComboBox" layoutX="636.0" layoutY="14.0" prefWidth="150.0" promptText="%language.selector" />
-      <PasswordField fx:id="passwordField" layoutX="311.0" layoutY="353.0" prefHeight="25.0" prefWidth="199.0">
+      <ComboBox fx:id="languageComboBox" layoutX="636.0" layoutY="14.0" prefWidth="150.0" promptText="%language.selector" onAction="#handleLanguageSelector"/>
+      <PasswordField fx:id="passwordField" layoutX="310.0" layoutY="365.0" prefHeight="25.0" prefWidth="199.0">
          <font>
             <Font size="16.0" />
          </font>
       </PasswordField>
+      <Label fx:id="nameLabel" layoutX="310.0" layoutY="140.0" text="%name.label">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <TextField fx:id="nameTextField" layoutX="310.0" layoutY="170.0">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </TextField>
    </children>
 </Pane>
