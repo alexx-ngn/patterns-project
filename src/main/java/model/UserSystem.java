@@ -1,8 +1,10 @@
 package model;
 
 import controller.DatabaseController;
+import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
+import view.UserInterface;
 
 import java.util.List;
 
@@ -13,7 +15,7 @@ public class UserSystem {
 
     private static UserSystem instance;
 
-    public UserSystem() {
+    private UserSystem() {
         this.userAccounts = DatabaseController.selectAllUsers();
     }
 
@@ -28,5 +30,14 @@ public class UserSystem {
         return instance;
     }
 
-    // TODO: validate User credentials
+    public static boolean authenticateUser(String username, String password) {
+        boolean success = false;
+        for (UserAccount user : getInstance().userAccounts) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                success = true;
+                break;
+            }
+        }
+        return success;
+    }
 }

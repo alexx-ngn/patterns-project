@@ -34,5 +34,14 @@ public class ReportSystem {
         return instance;
     }
 
-    // TODO: validate Admin credentials
+    private static boolean authenticateAdmin(String username, String password) {
+        boolean success = false;
+        for (AdminAccount admin : getInstance().adminAccounts) {
+            if (admin.getUsername().equals(username) && admin.getPassword().equals(password)) {
+                success = true;
+                break;
+            }
+        }
+        return success;
+    }
 }
