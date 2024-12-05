@@ -1,19 +1,11 @@
 import javafx.application.Application;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-import java.util.ResourceBundle;
+import view.LoginInterface;
 
 public class Y extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        ResourceBundle bundle = ResourceBundle.getBundle("lang/User");
-        FXMLLoader fxmlLoader = new FXMLLoader(Y.class.getResource("fxml/user.fxml"), bundle);
-        Scene scene = new Scene(fxmlLoader.load());
-        stage.setScene(scene);
-        stage.show();
+        // TODO implement here
+        LoginInterface.getInstance().start(stage);
     }
 }
