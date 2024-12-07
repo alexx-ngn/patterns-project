@@ -26,8 +26,8 @@ public class LoginInterface {
     }
 
     public void start(Stage stage) throws Exception {
-//        Locale locale = Locale.of("en","CA");
-        ResourceBundle bundle = ResourceBundle.getBundle("lang.Login");
+        Locale locale = Locale.of("en","CA");
+        ResourceBundle bundle = ResourceBundle.getBundle("lang.Login", locale);
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load());
         stage.setScene(scene);

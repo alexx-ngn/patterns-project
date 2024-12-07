@@ -1,5 +1,6 @@
 package view;
 
+import controller.LanguageManager;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -24,7 +25,7 @@ public class RegisterInterface {
     }
 
     public void start(Stage stage) throws Exception {
-        ResourceBundle bundle = ResourceBundle.getBundle("lang.Register");
+        ResourceBundle bundle = ResourceBundle.getBundle("lang.Register", LanguageManager.getInstance().getCurrentLocale());
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/register.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load());
         stage.setScene(scene);

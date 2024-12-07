@@ -86,7 +86,7 @@ public class LoginInterfaceController {
     void handleLanguageSelector(ActionEvent event) {
         String selectedLanguage = languageComboBox.getValue();
 
-        Locale locale = "French".equals(selectedLanguage) ? Locale.of("fr","CA") : Locale.of("en","US");
+        Locale locale = "French".equals(selectedLanguage) ? Locale.of("fr","CA") : Locale.of("en","CA");
         LanguageManager.getInstance().setLocale("Login", locale);
 
         updateLabels();
