@@ -49,11 +49,6 @@ public class UserInterfaceController {
 
     private Locale locale;
 
-    public void setLocale(Locale locale) {
-        this.locale = locale;
-        updateLabels();
-    }
-
     private void updateLabels() {
         ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
         welcomeLabel.setText(bundle.getString("welcome.label") + " " + UserSystem.getCurrentUser().getName());
@@ -70,9 +65,7 @@ public class UserInterfaceController {
 
     @FXML
     public void initialize() {
-        if (locale == null) {
-            locale = LanguageManager.getCurrentLocale();
-        }
+        locale = LanguageManager.getInstance().getCurrentLocale();
         updateLabels();
     }
 }

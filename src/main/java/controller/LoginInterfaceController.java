@@ -8,19 +8,20 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import model.UserAccount;
 import model.UserSystem;
-import view.LoginInterface;
 import view.RegisterInterface;
-import view.UserInterface;
 
 import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import static model.UserSystem.authenticateUser;
-
 public class LoginInterfaceController {
+    @FXML
+    public Label usernameLabel;
+
+    @FXML
+    public Label passwordLabel;
+
     @FXML
     private Label YLabel;
 
@@ -48,7 +49,7 @@ public class LoginInterfaceController {
         boolean loginSuccessful = UserSystem.authenticateUser(usernameTextField.getText(), passwordField.getText());
 
         if (loginSuccessful) {
-            Locale currentLocale = LanguageManager.getCurrentLocale();
+            Locale currentLocale = LanguageManager.getInstance().getCurrentLocale();
 
             this.loginPane.getScene().getWindow().hide();
             try {
@@ -59,9 +60,6 @@ public class LoginInterfaceController {
                 Stage stage = new Stage();
                 stage.setScene(new Scene(root));
                 stage.show();
-
-                UserInterfaceController controller = loader.getController();
-                controller.setLocale(currentLocale);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -83,27 +81,28 @@ public class LoginInterfaceController {
             throw new RuntimeException(e);
         }
     }
+
     @FXML
     void handleLanguageSelector(ActionEvent event) {
         String selectedLanguage = languageComboBox.getValue();
 
         Locale locale = "French".equals(selectedLanguage) ? Locale.of("fr","CA") : Locale.of("en","US");
-        LanguageManager.setLocale("Login", locale);
+        LanguageManager.getInstance().setLocale("Login", locale);
 
         updateLabels();
     }
 
     private void updateLabels() {
-        ResourceBundle bundle = LanguageManager.getResourceBundle("Login");
+        ResourceBundle bundle = LanguageManager.getInstance().getResourceBundle("Login");
         loginButton.setText(bundle.getString("login.button"));
         registerHyperlink.setText(bundle.getString("register.link"));
-        usernameTextField.setPromptText(bundle.getString("username.label"));
-        passwordField.setPromptText(bundle.getString("password.label"));
+        usernameLabel.setText(bundle.getString("username.label"));
+        passwordLabel.setText(bundle.getString("password.label"));
     }
 
     @FXML
     public void initialize() {
-        ResourceBundle bundle = LanguageManager.getResourceBundle("Login");
+        ResourceBundle bundle = LanguageManager.getInstance().getResourceBundle("Login");
         languageComboBox.getItems().addAll("English", "French");
         languageComboBox.setValue(bundle.getString("language.selector")); // Default selection
         updateLabels();

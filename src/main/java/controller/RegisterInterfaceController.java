@@ -51,6 +51,8 @@ public class RegisterInterfaceController {
     @FXML
     private TextField usernameTextField;
 
+    private Locale locale;
+
     @FXML
     void handleRegisterButton(ActionEvent event) {
         String name = nameTextField.getText();
@@ -101,14 +103,14 @@ public class RegisterInterfaceController {
     void handleLanguageSelector(ActionEvent event) {
         String selectedLanguage = languageComboBox.getValue();
 
-        Locale locale = "French".equals(selectedLanguage) ? new Locale("fr", "CA") : new Locale("en", "US");
-        LanguageManager.setLocale("Register", locale);
+        Locale locale = "French".equals(selectedLanguage) ? Locale.of("fr","CA") : Locale.of("en","US");
+        LanguageManager.getInstance().setLocale("Login", locale);
 
         updateLabels();
     }
 
     private void updateLabels() {
-        ResourceBundle bundle = LanguageManager.getResourceBundle("Register");
+        ResourceBundle bundle = ResourceBundle.getBundle("lang.Register", locale);
         nameLabel.setText(bundle.getString("name.label"));
         usernameLabel.setText(bundle.getString("username.label"));
         emailLabel.setText(bundle.getString("email.label"));
@@ -119,9 +121,10 @@ public class RegisterInterfaceController {
 
     @FXML
     public void initialize() {
-        ResourceBundle bundle = LanguageManager.getResourceBundle("Register");
+        ResourceBundle bundle = LanguageManager.getInstance().getResourceBundle("Register");
         languageComboBox.getItems().addAll("English", "French");
         languageComboBox.setValue(bundle.getString("language.selector")); // Default selection
+        locale = LanguageManager.getInstance().getCurrentLocale();
         updateLabels();
     }
 }
