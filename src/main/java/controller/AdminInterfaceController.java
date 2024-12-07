@@ -63,13 +63,8 @@ public class AdminInterfaceController {
 
     private Locale locale;
 
-    public void setLocale(Locale locale) {
-        this.locale = locale;
-        updateLabels();
-    }
-
     private void updateLabels() {
-        ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
+        ResourceBundle bundle = ResourceBundle.getBundle("lang.Admin", locale);
         welcomeLabel.setText(bundle.getString("welcome.label"));
         searchProfileButton.setText(bundle.getString("search.tab"));
         searchLabel.setText(bundle.getString("search.button"));
@@ -85,9 +80,7 @@ public class AdminInterfaceController {
 
     @FXML
     public void initialize() {
-        if (locale == null) {
-            locale = LanguageManager.getCurrentLocale();
-        }
+        locale = LanguageManager.getInstance().getCurrentLocale();
         updateLabels();
     }
 }
