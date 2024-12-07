@@ -1,11 +1,13 @@
 package view;
 
+import controller.LanguageManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import lombok.Getter;
 
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class LoginInterface {
@@ -24,7 +26,8 @@ public class LoginInterface {
     }
 
     public void start(Stage stage) throws Exception {
-        ResourceBundle bundle = ResourceBundle.getBundle("lang/Login");
+        Locale locale = LanguageManager.getCurrentLocale();
+        ResourceBundle bundle = ResourceBundle.getBundle("lang.Login", locale);
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load());
         stage.setScene(scene);

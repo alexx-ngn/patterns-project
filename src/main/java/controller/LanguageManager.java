@@ -4,7 +4,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class LanguageManager {
-    private static Locale currentLocale = new Locale("en", "CA");
+    private static Locale currentLocale = Locale.of("en","CA");
     private static ResourceBundle resourceBundle = ResourceBundle.getBundle("lang.Login", currentLocale);
 
     public static void setLocale(String scene, Locale locale) {
