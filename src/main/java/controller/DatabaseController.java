@@ -88,7 +88,7 @@ public class DatabaseController {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 reason TEXT NOT NULL,
                 status TEXT NOT NULL,
-                date DATE NOT NULL,
+                date INTEGER NOT NULL,
                 adminId INTEGER,
                 reporterId INTEGER NOT NULL,
                 reporteeId INTEGER NOT NULL,
@@ -103,7 +103,7 @@ public class DatabaseController {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 reason TEXT NOT NULL,
                 status TEXT NOT NULL,
-                date DATE NOT NULL,
+                date INTEGER NOT NULL,
                 adminId INTEGER,
                 reporterId INTEGER NOT NULL,
                 postId INTEGER NOT NULL,
@@ -137,6 +137,16 @@ public class DatabaseController {
             throw new IllegalArgumentException("SQL statement must be a CREATE statement");
         }
         executeDdlAndDml(sql);
+    }
+
+    public static void createAllTables() {
+        createTable(CREATE_ADMIN_TABLE);
+        createTable(CREATE_USER_TABLE);
+        createTable(CREATE_POST_TABLE);
+        createTable(CREATE_FOLLOW_TABLE);
+        createTable(CREATE_LIKE_TABLE);
+        createTable(CREATE_USER_REPORT_TABLE);
+        createTable(CREATE_POST_REPORT_TABLE);
     }
 
     /**

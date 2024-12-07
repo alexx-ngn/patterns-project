@@ -4,6 +4,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class RegisterInterface {
@@ -23,7 +24,7 @@ public class RegisterInterface {
     }
 
     public void start(Stage stage) throws Exception {
-        ResourceBundle bundle = ResourceBundle.getBundle("lang/Register");
+        ResourceBundle bundle = ResourceBundle.getBundle("lang.Register");
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/register.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load());
         stage.setScene(scene);

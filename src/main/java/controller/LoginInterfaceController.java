@@ -52,8 +52,8 @@ public class LoginInterfaceController {
 
             this.loginPane.getScene().getWindow().hide();
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/path/to/UserInterface.fxml"));
-                loader.setResources(ResourceBundle.getBundle("messages", currentLocale));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/user.fxml"));
+                loader.setResources(ResourceBundle.getBundle("lang.User", currentLocale));
                 Parent root = loader.load();
 
                 Stage stage = new Stage();
@@ -83,12 +83,11 @@ public class LoginInterfaceController {
             throw new RuntimeException(e);
         }
     }
-
     @FXML
     void handleLanguageSelector(ActionEvent event) {
         String selectedLanguage = languageComboBox.getValue();
 
-        Locale locale = "French".equals(selectedLanguage) ? new Locale("fr", "CA") : new Locale("en", "US");
+        Locale locale = "French".equals(selectedLanguage) ? Locale.of("fr","CA") : Locale.of("en","US");
         LanguageManager.setLocale("Login", locale);
 
         updateLabels();

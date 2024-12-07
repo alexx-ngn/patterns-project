@@ -22,7 +22,7 @@ public class UserInterface {
     }
 
     public void start(Stage stage) throws Exception {
-        ResourceBundle bundle = ResourceBundle.getBundle("lang/User");
+        ResourceBundle bundle = ResourceBundle.getBundle("lang.User");
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/user.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load());
         stage.setScene(scene);
