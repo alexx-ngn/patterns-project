@@ -2,6 +2,7 @@ package controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import model.UserSystem;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -55,7 +56,7 @@ public class UserInterfaceController {
 
     private void updateLabels() {
         ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
-        welcomeLabel.setText(bundle.getString("welcome.label"));
+        welcomeLabel.setText(bundle.getString("welcome.label") + " " + UserSystem.getCurrentUser().getName());
         searchProfileButton.setText(bundle.getString("search.button"));
         searchLabel.setText(bundle.getString("search.label"));
         searchButton.setText(bundle.getString("search.button"));
