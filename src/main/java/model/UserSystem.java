@@ -14,9 +14,11 @@ public class UserSystem {
     private List<UserAccount> userAccounts;
 
     private static UserSystem instance;
+    private static int currentUserId;
 
     private UserSystem() {
         this.userAccounts = DatabaseController.selectAllUsers();
+        currentUserId = -1;
     }
 
     public static UserSystem getInstance() {
@@ -35,6 +37,7 @@ public class UserSystem {
         for (UserAccount user : getInstance().userAccounts) {
             if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
                 success = true;
+                currentUserId = user.getId();
                 break;
             }
         }

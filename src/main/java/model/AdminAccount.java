@@ -13,8 +13,8 @@ public class AdminAccount extends Account {
 
     // Constructor for AdminAccount that handles all fields, this is used for fetching data from the database and
     // creating an object. Used for creating a list when selecting all from the database.
-    public AdminAccount(int id, String name, String email, String username, String password, Date creationDate) {
-        super(id, name, email, username, password, creationDate);
+    public AdminAccount(int id, String name, String email, String username, String password) {
+        super(id, name, email, username, password);
         this.assignedReports = new LinkedList<>();
     }
 

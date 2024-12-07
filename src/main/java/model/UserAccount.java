@@ -16,8 +16,8 @@ public class UserAccount extends Account {
 
     // Constructor for UserAccount that handles all fields, this is used for fetching data from the database and
     // creating an object. Used for creating a list when selecting all from the database.
-    public UserAccount(int id, String name, String email, String username, String password, Date creationDate, int followerCount) {
-        super(id, name, email, username, password, creationDate);
+    public UserAccount(int id, String name, String email, String username, String password, int followerCount) {
+        super(id, name, email, username, password);
         this.followerCount = followerCount;
         this.followers = new ArrayList<>();
         this.posts = new Stack<>();

@@ -4,6 +4,7 @@ import model.*;
 
 import java.sql.*;
 import java.sql.Date;
+import java.text.DateFormat;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -59,6 +60,7 @@ public class DatabaseController {
                 userId INTEGER NOT NULL,
                 content TEXT NOT NULL,
                 numLikes INTEGER DEFAULT 0,
+                datePosted INTEGER NOT NULL,
                 FOREIGN KEY (userId) REFERENCES users(id)
             )
             """;
@@ -90,6 +92,7 @@ public class DatabaseController {
                 status TEXT NOT NULL,
                 date INTEGER NOT NULL,
                 adminId INTEGER,
+                creationDate INTEGER NOT NULL,
                 reporterId INTEGER NOT NULL,
                 reporteeId INTEGER NOT NULL,
                 FOREIGN KEY (adminId) REFERENCES admins(id),
@@ -107,6 +110,7 @@ public class DatabaseController {
                 adminId INTEGER,
                 reporterId INTEGER NOT NULL,
                 postId INTEGER NOT NULL,
+                creationDate, INTEGER NOT NULL,
                 FOREIGN KEY (adminId) REFERENCES admins(id),
                 FOREIGN KEY (reporterId) REFERENCES users(id),
                 FOREIGN KEY (postId) REFERENCES posts(id)
@@ -456,8 +460,8 @@ public class DatabaseController {
                 String email = resultSet.getString("email");
                 String username = resultSet.getString("username");
                 String password = resultSet.getString("password");
-                Date creationDate = resultSet.getDate("creationDate");
-                AdminAccount admin = new AdminAccount(id, name, email, username, password, creationDate);
+
+                AdminAccount admin = new AdminAccount(id, name, email, username, password);
                 admins.add(admin);
             }
         } catch (SQLException e) {
@@ -487,9 +491,8 @@ public class DatabaseController {
                 String email = resultSet.getString("email");
                 String username = resultSet.getString("username");
                 String password = resultSet.getString("password");
-                Date creationDate = resultSet.getDate("creationDate");
                 int numFollowers = resultSet.getInt("numFollowers");
-                UserAccount user = new UserAccount(id, name, email, username, password, creationDate, numFollowers);
+                UserAccount user = new UserAccount(id, name, email, username, password, numFollowers);
                 searchResults.add(user);
             }
         } catch (SQLException e) {

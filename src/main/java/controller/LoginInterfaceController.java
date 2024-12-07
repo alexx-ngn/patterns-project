@@ -45,7 +45,7 @@ public class LoginInterfaceController {
     @FXML
     void handleLoginButton(ActionEvent event) {
         // TODO: ADMIN LOGIN
-        boolean loginSuccessful = authenticateUser(usernameTextField.getText(), passwordField.getText());
+        boolean loginSuccessful = UserSystem.authenticateUser(usernameTextField.getText(), passwordField.getText());
 
         if (loginSuccessful) {
             Locale currentLocale = LanguageManager.getCurrentLocale();

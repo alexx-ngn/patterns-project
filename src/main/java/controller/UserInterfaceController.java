@@ -54,7 +54,7 @@ public class UserInterfaceController {
     }
 
     private void updateLabels() {
-        ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
+        ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
         welcomeLabel.setText(bundle.getString("welcome.label"));
         searchProfileButton.setText(bundle.getString("search.button"));
         searchLabel.setText(bundle.getString("search.label"));
