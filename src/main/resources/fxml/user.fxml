@@ -28,23 +28,23 @@
                <Font size="16.0" />
             </font>
          </Label>
-         <Button fx:id="postButton" mnemonicParsing="false" prefHeight="47.0" prefWidth="131.0" text="%post.button">
+         <Button fx:id="postButton" mnemonicParsing="false" onAction="#handlePostButton" prefHeight="47.0" prefWidth="131.0" text="%post.button">
             <font>
                <Font name="System Bold" size="16.0" />
             </font>
          </Button>
-            <Button fx:id="homeButton" prefHeight="26.0" prefWidth="107.0" text="%home.button" />
-         <Button fx:id="searchButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="150.0" text="%search.button" />
-            <Button fx:id="profileButton" prefHeight="26.0" prefWidth="140.0" text="%profile.button" />
-         <Button fx:id="logoutButton" alignment="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="128.0" text="%logout.button" />
+            <Button fx:id="homeButton" onAction="#handleHomeButton" prefHeight="26.0" prefWidth="107.0" text="%home.button" />
+         <Button fx:id="searchButton" mnemonicParsing="false" onAction="#handleSearchButton" prefHeight="26.0" prefWidth="150.0" text="%search.button" />
+            <Button fx:id="profileButton" onAction="#handleProfileButton" prefHeight="26.0" prefWidth="140.0" text="%profile.button" />
+         <Button fx:id="logoutButton" alignment="CENTER" mnemonicParsing="false" onAction="#handleLogoutButton" prefHeight="26.0" prefWidth="128.0" text="%logout.button" />
         </VBox>
     </left>
 
     <!-- Center Content -->
     <center>
-      <TabPane prefHeight="200.0" prefWidth="1206.0" tabClosingPolicy="UNAVAILABLE">
+      <TabPane fx:id="userTabPane" prefHeight="586.0" prefWidth="1160.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
-          <Tab id="homeTab" text="Home">
+          <Tab id="homeTab" text="%home.button">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -52,7 +52,7 @@
                           <content>
                             <AnchorPane>
                                  <children>
-                                    <VBox>
+                                    <VBox fx:id="feedVBox">
                                        <children>
                                                 <Label fx:id="overviewLabel" text="%overview.label">
                                                     <font>
@@ -137,7 +137,7 @@
                   </AnchorPane>
             </content>
           </Tab>
-          <Tab id="searchTab" text="search.label">
+          <Tab id="searchTab" text="%search.button">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -158,7 +158,7 @@
                                                 <Button fx:id="searchProfileButton" mnemonicParsing="false" prefHeight="34.0" prefWidth="98.0" text="%search.button" />
                                              </children>
                                           </HBox>
-                                          <ListView fx:id="searchListView" prefHeight="555.0" prefWidth="1171.0" />
+                                          <ListView fx:id="searchListView" prefHeight="586.0" prefWidth="1171.0" />
                                        </children>
                                     </VBox>
                                  </children>
@@ -168,7 +168,7 @@
                      </children></AnchorPane>
             </content>
           </Tab>
-            <Tab id="profileTab" text="My Profile">
+            <Tab id="profileTab" text="%profile.button">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
