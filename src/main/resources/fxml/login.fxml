@@ -16,12 +16,12 @@
             <Font size="108.0" />
          </font>
       </Label>
-      <Label layoutX="300.0" layoutY="214.0" text="%username.label">
+      <Label fx:id="usernameLabel" layoutX="300.0" layoutY="214.0" text="%username.label">
          <font>
             <Font size="20.0" />
          </font>
       </Label>
-      <Label layoutX="301.0" layoutY="280.0" text="%password.label">
+      <Label fx:id="passwordLabel" layoutX="301.0" layoutY="280.0" text="%password.label">
          <font>
             <Font size="20.0" />
          </font>
