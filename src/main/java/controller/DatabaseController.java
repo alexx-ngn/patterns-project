@@ -49,7 +49,7 @@ public class DatabaseController {
                 email TEXT NOT NULL UNIQUE,
                 username TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
-                numFollowers INTEGER DEFAULT 0,
+                numFollowers INTEGER DEFAULT 0
             )
             """;
 
@@ -94,7 +94,7 @@ public class DatabaseController {
                 reporteeId INTEGER NOT NULL,
                 FOREIGN KEY (adminId) REFERENCES admins(id),
                 FOREIGN KEY (reporterId) REFERENCES users(id),
-                FOREIGN KEY (reporteeId) REFERENCES users(id),
+                FOREIGN KEY (reporteeId) REFERENCES users(id)
             )
             """; //Possibly change adminId to be not null?
 
@@ -109,7 +109,7 @@ public class DatabaseController {
                 postId INTEGER NOT NULL,
                 FOREIGN KEY (adminId) REFERENCES admins(id),
                 FOREIGN KEY (reporterId) REFERENCES users(id),
-                FOREIGN KEY (postId) REFERENCES posts(id),
+                FOREIGN KEY (postId) REFERENCES posts(id)
             )
             """; //Possibly change adminId to be not null?
 
