@@ -58,7 +58,8 @@ public class UserSystemController {
     public void userPost(UserAccount userAccount, String text) {
         threadPool.submit(() -> {
             Post post = userAccount.post(text);
-            String sql = DatabaseController.generateInsertStatement("posts", post.getUserId(), post.getText(), post.getUsersLiked());
+            String sql = DatabaseController.generateInsertStatement("posts", post.getUserId(), post.getText(),
+                    post.getUsersLiked(), post.getDatePosted());
             DatabaseController.insertRecord(sql);
         });
     }

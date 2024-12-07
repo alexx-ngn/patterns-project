@@ -16,24 +16,24 @@
             <Font size="108.0" />
          </font>
       </Label>
-      <Label layoutX="300.0" layoutY="214.0" text="%username.label">
+      <Label fx:id="usernameLabel" layoutX="300.0" layoutY="214.0" text="%username.label">
          <font>
             <Font size="20.0" />
          </font>
       </Label>
-      <Label layoutX="301.0" layoutY="280.0" text="%password.label">
+      <Label fx:id="passwordLabel" layoutX="301.0" layoutY="280.0" text="%password.label">
          <font>
             <Font size="20.0" />
          </font>
       </Label>
-      <TextField fx:id="usernameTextField" layoutX="300.0" layoutY="244.0">
+      <TextField fx:id="usernameTextField" layoutX="300.0" layoutY="244.0" promptText="%username.label">
          <font>
             <Font size="16.0" />
          </font>
       </TextField>
       <Button fx:id="loginButton" layoutX="420.0" layoutY="373.0" mnemonicParsing="false" onAction="#handleLoginButton" prefHeight="25.0" prefWidth="74.0" text="%login.button" />
       <Hyperlink fx:id="registerHyperlink" layoutX="301.0" layoutY="344.0" onAction="#handleRegisterHyperlink" text="%register.link" />
-      <PasswordField fx:id="passwordField" layoutX="300.0" layoutY="310.0" prefHeight="36.0" prefWidth="199.0">
+      <PasswordField fx:id="passwordField" layoutX="300.0" layoutY="310.0" prefHeight="36.0" prefWidth="199.0" promptText="%password.label">
          <font>
             <Font size="16.0" />
          </font>
