@@ -10,6 +10,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.application.Platform;
 import model.Post;
 import model.UserSystem;
 import view.LoginInterface;
@@ -213,8 +214,12 @@ public class UserInterfaceController {
         Label counterLabel = new Label("0");
         counterLabel.setStyle("-fx-padding: 10;");
         Button likeButton = new Button("👍");
-//        likeButton.setOnAction(event -> handleLikeButton(counterLabel, postId));
+        likeButton.setOnAction(event -> handleLikeButton(counterLabel, postId));
         Button reportButton = new Button("⚠");
+
+        // Update counterLabel value
+        Post post = UserSystemController.getInstance().getPostById(postId);
+        counterLabel.setText("" + post.getLikes());
 
         // Add reaction elements to HBox
         reactionBox.getChildren().addAll(counterLabel, likeButton, reportButton);
@@ -254,7 +259,7 @@ public class UserInterfaceController {
 //        counterLabel.setText(String.valueOf(handleLikeButton(counterLabel, postId)));
         counterLabel.setStyle("-fx-padding: 10;");
         Button likeButton = new Button("👍");
-//        likeButton.setOnAction(event -> handleLikeButton(counterLabel, postId));
+        likeButton.setOnAction(event -> handleLikeButton(counterLabel, postId));
         Button removeButton = new Button("🗑");
         removeButton.setOnAction(event -> {
                     handleRemovePost(UserSystemController.getInstance().getPostById(postId));
@@ -262,6 +267,10 @@ public class UserInterfaceController {
                     loadProfile();
                     loadFeed();
         });
+
+        // Update counterLabel value
+        Post post = UserSystemController.getInstance().getPostById(postId);
+        counterLabel.setText("" + post.getLikes());
 
         // Add reaction elements to HBox
         reactionBox.getChildren().addAll(counterLabel, likeButton, removeButton);
@@ -326,8 +335,19 @@ public class UserInterfaceController {
     @FXML
     void handleLikeButton(Label counterLabel, int postId) {
         Post post = UserSystemController.getInstance().getPostById(postId); // Get post from its id
-        UserSystemController.getInstance().userLikePost(UserSystem.getInstance().getCurrentUser(), post); // Like the post within DB
-        post = UserSystemController.getInstance().getPostById(postId); // Update the post to the version added to DB from userLikePost method
-        counterLabel.setText("" + post.getUsersLiked().size());
+
+        // Check if current user has liked already to then either like or dislike the post
+        Post updatedPost;
+        if (!post.getLikedByUserIds().contains(UserSystem.getInstance().getCurrentUser().getId())) {
+            UserSystemController.getInstance().userLikePost(UserSystem.getInstance().getCurrentUser(), post);
+            updatedPost = UserSystemController.getInstance().getPostById(postId);
+        } else {
+            UserSystemController.getInstance().userUnlikePost(UserSystem.getInstance().getCurrentUser(), post);
+            updatedPost = UserSystemController.getInstance().getPostById(postId);
+        }
+
+        // Refresh to load changes
+        Platform.runLater(() -> counterLabel.setText("" + updatedPost.getLikes()));
+        loadFeed();
     }
 }
