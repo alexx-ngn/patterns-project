@@ -1,10 +1,7 @@
 package controller;
 
 import lombok.Getter;
-import model.Post;
-import model.ReportSystem;
-import model.UserAccount;
-import model.UserSystem;
+import model.*;
 
 import java.time.Instant;
 import java.util.concurrent.ExecutorService;
@@ -75,6 +72,8 @@ public class UserSystemController {
             String sql = DatabaseController.generateFullInsertStatement("likes", userAccount.getId(), post.getId());
             DatabaseController.insertRecord(sql);
 
+            // TODO: ALSO NEED TO MODIFY LIKES COUNTER
+
             // Update usersLiked property of the post
             post.setUsersLiked(DatabaseController.selectAllUserLikesFromPost(post));
         });
@@ -82,6 +81,22 @@ public class UserSystemController {
 
     public Post getPostById(int postId) {
         String sql = DatabaseController.generateSelectStatement("posts", "id", postId);
-        return DatabaseController.selectRecord(sql).getFirst();
+        return DatabaseController.selectPostRecord(sql).getFirst();
+    }
+
+    public void adminRemovePost(Post post) {
+        threadPool.submit(() -> {
+            userSystem.getAllPosts().remove(post);
+            String sql = DatabaseController.generateDeleteStatement("posts", "id", post.getId());
+            DatabaseController.deleteRecord(sql);
+        });
+    }
+
+    public void adminBanUser(AdminAccount adminAccount, UserAccount userAccount) {
+        threadPool.submit(() -> {
+            userSystem.getUserAccounts().remove(userAccount);
+            String sql = DatabaseController.generateDeleteStatement("post_reports", "id", userAccount.getId());
+            DatabaseController.deleteRecord(sql);
+        });
     }
 }
