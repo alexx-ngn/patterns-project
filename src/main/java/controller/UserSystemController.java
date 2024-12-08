@@ -2,9 +2,11 @@ package controller;
 
 import lombok.Getter;
 import model.Post;
+import model.ReportSystem;
 import model.UserAccount;
 import model.UserSystem;
 
+import java.time.Instant;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -41,6 +43,7 @@ public class UserSystemController {
 
     public void userRemovePost(UserAccount userAccount, Post post) {
         threadPool.submit(() -> {
+            userSystem.getAllPosts().remove(post);
             userAccount.removePost(post);
             String sql = DatabaseController.generateDeleteStatement("posts", "id", post.getId());
             DatabaseController.deleteRecord(sql);
@@ -58,8 +61,10 @@ public class UserSystemController {
     public void userPost(UserAccount userAccount, String text) {
         threadPool.submit(() -> {
             Post post = userAccount.post(text);
+            userSystem.getAllPosts().add(post);
+            userAccount.getPosts().add(post);
             String sql = DatabaseController.generateInsertStatement("posts", post.getUserId(), post.getText(),
-                    post.getUsersLiked(), post.getDatePosted());
+                    post.getUsersLiked().size(), Instant.now().getEpochSecond());
             DatabaseController.insertRecord(sql);
         });
     }
@@ -73,5 +78,10 @@ public class UserSystemController {
             // Update usersLiked property of the post
             post.setUsersLiked(DatabaseController.selectAllUserLikesFromPost(post));
         });
+    }
+
+    public Post getPostById(int postId) {
+        String sql = DatabaseController.generateSelectStatement("posts", "id", postId);
+        return DatabaseController.selectRecord(sql).getFirst();
     }
 }

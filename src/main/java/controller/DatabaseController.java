@@ -212,11 +212,36 @@ public class DatabaseController {
      * Selects a record from a table
      * @param sql the SELECT statement to execute
      */
-    public static void selectRecord(String sql) {
+    public static List<Post> selectRecord(String sql) {
         if (!sql.toUpperCase().contains("SELECT")) {
             throw new IllegalArgumentException("SQL statement must be a SELECT statement");
         }
-        executeDdlAndDml(sql);
+        return executeSelectPosts(sql);
+    }
+
+    private static List<Post> executeSelectPosts(String sql) {
+        READ_LOCK.lock();
+        try (Connection connection = connect(DB_PATH);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+
+            List<Post> results = new ArrayList<>();
+            while (resultSet.next()) {
+                Post post = new Post(
+                        resultSet.getInt("id"),
+                        resultSet.getInt("userId"),
+                        resultSet.getString("content"),
+                        resultSet.getInt("numLikes"),
+                        new Date(resultSet.getLong("datePosted") * 1000L)
+                );
+                results.add(post);
+            }
+            return results;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            READ_LOCK.unlock();
+        }
     }
 
     /**
@@ -522,14 +547,9 @@ public class DatabaseController {
         return getUserAccounts(sql);
     }
 
-    /**
-     * Selects all posts from the database for a given user account
-     * @param account the user account to select posts for
-     * @return a list of all posts for the user account
-     */
-    public static List<Post> selectAllPosts (UserAccount account) {
+    public static List<Post> selectAllPosts() {
         READ_LOCK.lock();
-        String sql = "SELECT * FROM posts"  + " WHERE userId = " + account.getId();
+        String sql = "SELECT * FROM posts";
 
         List<Post> posts = new ArrayList<>();
         try (Connection connection = connect(DB_PATH);
@@ -539,9 +559,40 @@ public class DatabaseController {
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 int userId = resultSet.getInt("userId");
-                String text = resultSet.getString("text");
-                int likes = resultSet.getInt("likes");
-                Date datePosted = resultSet.getDate("datePosted");
+                String text = resultSet.getString("content");
+                int likes = resultSet.getInt("numLikes");
+                Date datePosted = new Date(resultSet.getLong("datePosted") * 1000L);
+                Post post = new Post(id, userId, text, likes, datePosted);
+                posts.add(post);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            READ_LOCK.unlock();
+        }
+        return posts;
+    }
+
+    /**
+     * Selects all posts from the database for a given user account
+     * @param account the user account to select posts for
+     * @return a list of all posts for the user account
+     */
+    public static List<Post> selectAllPosts (UserAccount account) {
+        READ_LOCK.lock();
+        String sql = "SELECT * FROM posts" + " WHERE userId = " + account.getId();
+
+        List<Post> posts = new ArrayList<>();
+        try (Connection connection = connect(DB_PATH);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql))
+        {
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                int userId = resultSet.getInt("userId");
+                String text = resultSet.getString("content");
+                int likes = resultSet.getInt("numLikes");
+                Date datePosted = new Date(resultSet.getLong("datePosted") * 1000L);
                 Post post = new Post(id, userId, text, likes, datePosted);
                 posts.add(post);
             }

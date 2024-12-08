@@ -10,11 +10,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import model.Post;
 import model.UserSystem;
 import view.LoginInterface;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
@@ -66,7 +68,11 @@ public class UserInterfaceController {
     @FXML
     private VBox feedVBox;
 
+    @FXML
+    private VBox profileVBox;
+
     private Locale locale;
+
 
     public void setLocale(Locale locale) {
         this.locale = locale;
@@ -75,7 +81,7 @@ public class UserInterfaceController {
 
     private void updateLabels() {
         ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
-        welcomeLabel.setText(bundle.getString("welcome.label") + " " + UserSystem.getCurrentUser().getName());
+        welcomeLabel.setText(bundle.getString("welcome.label") + " " + UserSystem.getInstance().getCurrentUser().getName());
         searchProfileButton.setText(bundle.getString("search.button"));
         searchLabel.setText(bundle.getString("search.label"));
         searchButton.setText(bundle.getString("search.button"));
@@ -98,13 +104,41 @@ public class UserInterfaceController {
                 i--;
             }
         }
-        UserSystem.getCurrentUser().getPosts().forEach(post -> {
-            AnchorPane postPane = new AnchorPane();
-            Label postLabel = new Label(post.getText());
-            postPane.getChildren().add(postLabel);
-            feedVBox.getChildren().add(postPane);
+
+        UserSystem.getInstance().getAllPosts().forEach(post -> {
+            // Get the current date and time
+            Date postDate = post.getDatePosted();
+//
+//            // Get the current date and time
+//            LocalDateTime localDateTime = postDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+//
+//            // Define a formatter for the desired format (yyyy-MM-dd HH:mm)
+//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+//
+//            // Format the current date and time
+//            String formattedDateTime = localDateTime.format(formatter);
+
+            String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + postDate;
+            addPostToFeed(header, post.getText());
         });
     }
+
+//    private void loadProfile() {
+//        for (int i = 0; i < profileVBox.getChildren().size(); i++) {
+//            if (profileVBox.getChildren().get(i) instanceof VBox) {
+//                profileVBox.getChildren().remove(i);
+//                i--;
+//            }
+//        }
+//        UserSystem.getInstance().getPostsByUser(UserSystem.getInstance().getCurrentUser()).forEach(post -> {
+////            AnchorPane postPane = new AnchorPane();
+////            Label postLabel = new Label(post.getText());
+////            postPane.getChildren().add(postLabel);
+////            profileVBox.getChildren().add(postPane);
+//            String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + post.getDatePosted();
+////            addPostToProfile(header, post.getText(), post.getId());
+//        });
+//    }
 
     @FXML
     public void initialize() {
@@ -130,8 +164,9 @@ public class UserInterfaceController {
         dialog.showAndWait().ifPresent(text -> {
             String postContent = textArea.getText();
             if (!postContent.trim().isEmpty()) {
-                UserSystemController.getInstance().userPost(UserSystem.getCurrentUser(), postContent); // Update the backend
-                UserSystem.getCurrentUser().post(postContent); // Update the backend
+                UserSystemController.getInstance().userPost(UserSystem.getInstance().getCurrentUser(), postContent); // Update the backend
+//                int postId = UserSystem.getInstance().getCurrentUser().getPosts().getLast().getId();
+                UserSystem.getInstance().getCurrentUser().post(postContent); // Update the backend
 
                 // Get the current date and time
                 LocalDateTime now = LocalDateTime.now();
@@ -142,7 +177,7 @@ public class UserInterfaceController {
                 // Format the current date and time
                 String formattedDateTime = now.format(formatter);
 
-                String header = UserSystem.getCurrentUser().getName() + " - " + formattedDateTime; // Create the header
+                String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + formattedDateTime; // Create the header
                 addPostToFeed(header, postContent); // Add to the feed visually
             }
         });
@@ -174,6 +209,7 @@ public class UserInterfaceController {
         Label counterLabel = new Label("0");
         counterLabel.setStyle("-fx-padding: 10;");
         Button likeButton = new Button("👍");
+//        likeButton.setOnAction(event -> handleLikeButton(counterLabel, postId));
         Button reportButton = new Button("⚠");
 
         // Add reaction elements to HBox
@@ -198,17 +234,90 @@ public class UserInterfaceController {
 
     @FXML
     void handleProfileButton() {
-        userTabPane.getSelectionModel().select(2);
+        userTabPane.getSelectionModel().select(2); // Switch to the profile tab
+
+        // Clear the existing content in profileVBox to avoid duplicates
+//        profileVBox.getChildren().clear();
+//        profileVBox.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;");
+//        profileVBox.setSpacing(5);
+//
+//        // Retrieve the current user's posts
+//        UserSystem.getInstance().getCurrentUser().getPosts().forEach(post -> {
+//            // Create a header with the user's name and the post date
+//            String headerText = UserSystem.getInstance().getCurrentUser().getName() + " - " + post.getDatePosted();
+//
+//            // Add the post to the profile view
+//            addPostToProfile(headerText, post.getText(), post.getId());
+//        });
+    }
+
+    // Helper method to add a post to the profileVBox
+//    private void addPostToProfile(String headerText, String postContent, int postId) {
+//        // Create a VBox for the post
+//        VBox postBox = new VBox();
+//        postBox.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;");
+//        postBox.setSpacing(5);
+//
+//        // Create the header Label
+//        Label headerLabel = new Label(headerText);
+//        headerLabel.setFont(new Font("System Bold", 18));
+//        headerLabel.setPrefSize(250, 18);
+//
+//        // Create the content Label
+//        Label contentLabel = new Label(postContent);
+//        contentLabel.setWrapText(true);
+//        contentLabel.setPrefSize(1123, 150);
+//
+//        // Create the HBox for reactions
+//        HBox reactionBox = new HBox();
+//        reactionBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+//        reactionBox.setSpacing(5);
+//        reactionBox.setPrefSize(1134, 35);
+//
+//        // Reaction elements
+//        Label counterLabel = new Label("0");
+//        counterLabel.setText(String.valueOf(handleLikeButton(counterLabel, postId)));
+//        counterLabel.setStyle("-fx-padding: 10;");
+//        Button likeButton = new Button("👍");
+//        likeButton.setOnAction(event -> handleLikeButton(counterLabel, postId));
+//        Button removeButton = new Button("🗑");
+//        removeButton.setOnAction(event -> handleRemovePost(UserSystemController.getInstance().getPostById(postId)));
+//
+//        // Add reaction elements to HBox
+//        reactionBox.getChildren().addAll(counterLabel, likeButton, removeButton);
+//
+//        // Add all elements to the post VBox
+//        postBox.getChildren().addAll(headerLabel, contentLabel, reactionBox);
+//
+//        // Add the post VBox to the profile container
+//        profileVBox.getChildren().add(postBox);
+//    }
+
+    // Method to handle removing a post
+    private void handleRemovePost(Post post) {
+        // Logic to remove a post (e.g., from the backend and update the UI)
+        UserSystemController.getInstance().userRemovePost(UserSystem.getInstance().getCurrentUser(), post);
+
+        // Refresh the profile view to reflect the changes
+        // handleProfileButton();
     }
 
     @FXML
     void handleLogoutButton() {
-//        UserSystem.logout();
-        this.userTabPane.getScene().getWindow().hide();
+        Stage currentStage = (Stage) this.userTabPane.getScene().getWindow();
+        currentStage.close();
         try {
             LoginInterface.getInstance().start(new Stage());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @FXML
+    void handleLikeButton(Label counterLabel, int postId) {
+        Post post = UserSystemController.getInstance().getPostById(postId); // Get post from its id
+        UserSystemController.getInstance().userLikePost(UserSystem.getInstance().getCurrentUser(), post); // Like the post within DB
+        post = UserSystemController.getInstance().getPostById(postId); // Update the post to the version added to DB from userLikePost method
+        counterLabel.setText("" + post.getUsersLiked().size());
     }
 }

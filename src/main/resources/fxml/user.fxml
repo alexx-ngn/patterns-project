@@ -42,7 +42,7 @@
 
     <!-- Center Content -->
     <center>
-      <TabPane fx:id="userTabPane" prefHeight="586.0" prefWidth="1160.0" tabClosingPolicy="UNAVAILABLE">
+      <TabPane fx:id="userTabPane" prefHeight="586.0" prefWidth="1163.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
           <Tab id="homeTab" text="%home.button">
             <content>
@@ -176,7 +176,7 @@
                            <content>
                               <AnchorPane>
                                  <children>
-                                    <VBox>
+                                    <VBox fx:id="profileVBox">
                                        <children>
                                           <Label fx:id="postsLabel" text="%myPosts.label">
                                              <font>

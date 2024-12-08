@@ -46,8 +46,7 @@ public class LoginInterfaceController {
     @FXML
     void handleLoginButton(ActionEvent event) {
         // TODO: ADMIN LOGIN
-        boolean loginSuccessful = UserSystem.authenticateUser(usernameTextField.getText(), passwordField.getText());
-
+        boolean loginSuccessful = UserSystem.getInstance().authenticateUser(usernameTextField.getText(), passwordField.getText());
         if (loginSuccessful) {
             Locale currentLocale = LanguageManager.getInstance().getCurrentLocale();
 
@@ -98,6 +97,8 @@ public class LoginInterfaceController {
         registerHyperlink.setText(bundle.getString("register.link"));
         usernameLabel.setText(bundle.getString("username.label"));
         passwordLabel.setText(bundle.getString("password.label"));
+        usernameTextField.setPromptText(bundle.getString("username.label"));
+        passwordField.setPromptText(bundle.getString("password.label"));
     }
 
     @FXML

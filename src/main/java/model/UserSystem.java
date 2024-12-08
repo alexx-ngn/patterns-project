@@ -2,20 +2,27 @@ package model;
 
 import controller.DatabaseController;
 import javafx.stage.Stage;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import view.UserInterface;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 public class UserSystem {
+
+    @Getter
     private List<UserAccount> userAccounts;
 
     private static UserSystem instance;
     @Getter
-    private static UserAccount currentUser;
+    private UserAccount currentUser;
+    @Getter
+    private List<Post> allPosts = DatabaseController.selectAllPosts();
 
     private UserSystem() {
         this.userAccounts = DatabaseController.selectAllUsers();
@@ -33,7 +40,7 @@ public class UserSystem {
         return instance;
     }
 
-    public static boolean authenticateUser(String username, String password) {
+    public boolean authenticateUser(String username, String password) {
         boolean success = false;
         for (UserAccount user : getInstance().userAccounts) {
             if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
@@ -43,5 +50,15 @@ public class UserSystem {
             }
         }
         return success;
+    }
+
+    public List<Post> getPostsByUser(UserAccount userAccount) {
+        List<Post> posts = new ArrayList<>();
+        for (Post post : allPosts) {
+            if (post.getUserId() == userAccount.getId()) {
+                posts.add(post);
+            }
+        }
+        return posts;
     }
 }

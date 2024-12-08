@@ -20,7 +20,7 @@ public class UserAccount extends Account {
         super(id, name, email, username, password);
         this.followerCount = followerCount;
         this.followers = new ArrayList<>();
-        this.posts = new Stack<>();
+        this.posts = new ArrayList<>();
     }
 
     public UserAccount(String name, String email, String username, String password) {

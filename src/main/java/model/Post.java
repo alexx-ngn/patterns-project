@@ -31,5 +31,6 @@ public class Post {
         this.text = text;
         this.likes = likes;
         this.usersLiked = new HashSet<>();
+        this.datePosted = datePosted;
     }
 }
