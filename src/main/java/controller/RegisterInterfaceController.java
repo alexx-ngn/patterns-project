@@ -5,6 +5,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import model.Account;
+import model.AccountFactory;
+import model.AdminAccount;
 import model.UserAccount;
 import view.LoginInterface;
 
@@ -17,6 +20,9 @@ public class RegisterInterfaceController {
 
     @FXML
     public TextField nameTextField;
+
+    @FXML
+    public ComboBox<String> accountComboBox;
 
     @FXML
     private Label YLabel;
@@ -53,6 +59,8 @@ public class RegisterInterfaceController {
 
     private Locale locale;
 
+    private String accountType;
+
     @FXML
     void handleRegisterButton(ActionEvent event) {
         String name = nameTextField.getText();
@@ -60,7 +68,7 @@ public class RegisterInterfaceController {
         String username = usernameTextField.getText();
         String password = passwordField.getText();
 
-        if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+        if (username.isEmpty() || email.isEmpty() || password.isEmpty() || accountType == null) {
             // Show an alert if any field is empty
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Registration Error");
@@ -68,9 +76,15 @@ public class RegisterInterfaceController {
             alert.setContentText("Please fill out all fields to register.");
             alert.showAndWait();
         } else {
-            // Call the UserSystemController singleton to handle registration
-            UserSystemController controller = UserSystemController.getInstance();
-            controller.addUser(new UserAccount(name, email, username, password));
+            // Call the AccountFactory and User/Report-SystemController singleton to handle registration
+            Account account = AccountFactory.createAccount(accountType, name, email, username, password);
+
+            // Determine appropriate controller based on account type
+            if (account instanceof UserAccount) {
+                UserSystemController.getInstance().addUser((UserAccount) account);
+            } else if (account instanceof AdminAccount) {
+                ReportSystemController.getInstance().addAdmin((AdminAccount) account);
+            }
 
             // Show a success popup
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -109,6 +123,11 @@ public class RegisterInterfaceController {
         updateLabels();
     }
 
+    @FXML
+    void handleAccountSelector(ActionEvent event) {
+        accountType = accountComboBox.getValue();
+    }
+
     private void updateLabels() {
         ResourceBundle bundle = ResourceBundle.getBundle("lang.Register", locale);
         nameLabel.setText(bundle.getString("name.label"));
@@ -124,6 +143,9 @@ public class RegisterInterfaceController {
         ResourceBundle bundle = LanguageManager.getInstance().getResourceBundle("Register");
         languageComboBox.getItems().addAll("English", "French");
         languageComboBox.setValue(bundle.getString("language.selector")); // Default selection
+        accountComboBox.getItems().addAll("User", "Admin");
+        accountComboBox.setValue(bundle.getString("account.selector")); // Default selection
+
         locale = LanguageManager.getInstance().getCurrentLocale();
         updateLabels();
     }

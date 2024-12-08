@@ -43,7 +43,7 @@
             <Font size="16.0" />
          </font>
       </TextField>
-      <ComboBox fx:id="languageComboBox" layoutX="636.0" layoutY="14.0" prefWidth="150.0" promptText="%language.selector" onAction="#handleLanguageSelector"/>
+      <ComboBox fx:id="languageComboBox" layoutX="636.0" layoutY="14.0" onAction="#handleLanguageSelector" prefWidth="150.0" promptText="%language.selector" />
       <PasswordField fx:id="passwordField" layoutX="310.0" layoutY="365.0" prefHeight="25.0" prefWidth="199.0">
          <font>
             <Font size="16.0" />
@@ -59,5 +59,6 @@
             <Font size="16.0" />
          </font>
       </TextField>
+      <ComboBox fx:id="accountComboBox" layoutX="310.0" layoutY="422.0" onAction="#handleAccountSelector" prefHeight="25.0" prefWidth="110.0" promptText="%account.selector" />
    </children>
 </Pane>
