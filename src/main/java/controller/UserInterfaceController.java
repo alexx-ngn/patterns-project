@@ -108,8 +108,9 @@ public class UserInterfaceController {
         UserSystem.getInstance().getAllPosts().forEach(post -> {
             // Get the current date and time
             Date postDate = post.getDatePosted();
+            String username = UserSystem.getInstance().getUserById(post.getUserId());
 
-            String header = post.getUserId() + " - " + getFormattedDateTime(postDate);
+            String header = username + " - " + getFormattedDateTime(postDate);
             addPostToFeed(header, post.getText());
         });
     }
@@ -177,7 +178,7 @@ public class UserInterfaceController {
                 UserSystemController.getInstance().userPost(currentUser, postContent); // Update the backend
 //                int postId = UserSystem.getInstance().getCurrentUser().getPosts().getLast().getId();
                 UserSystem.getInstance().getCurrentUser().post(postContent); // Update the backend
-                Date postDate = UserSystem.getInstance().getCurrentUser().getPosts().getLast().getDatePosted();
+                Date postDate = UserSystem.getInstance().getAllPosts().getLast().getDatePosted();
 
                 String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + getFormattedDateTime(postDate); // Create the header
                 addPostToFeed(header, postContent); // Add to the feed visually
