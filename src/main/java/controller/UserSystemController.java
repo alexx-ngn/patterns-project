@@ -67,7 +67,7 @@ public class UserSystemController {
     }
 
     public void userLikePost(UserAccount userAccount, Post post) {
-        threadPool.submit(() -> {
+        // threadPool.submit(() -> { TODO: Prevention of user only liking post once only works without threadPool.submit()
             // Insert likes record
             String insertSql = DatabaseController.generateFullInsertStatement("likes", userAccount.getId(), post.getId());
             DatabaseController.insertRecord(insertSql);
@@ -81,14 +81,15 @@ public class UserSystemController {
             // Update numLikes column of post record
             String updateSql = DatabaseController.generateUpdateStatement("posts", "numLikes", post.getLikedByUserIds().size(), "id", post.getId());
             DatabaseController.updateRecord(updateSql);
-        });
+        // });
     }
 
     public void userUnlikePost(UserAccount userAccount, Post post) {
-        threadPool.submit(() -> {
+        // threadPool.submit(() -> {
             // Insert likes record
             String sql = DatabaseController.generateDeleteStatement("likes", "userId", 123, "postId", 456);
-            DatabaseController.deleteRecord(sql);
+            System.out.println(sql);
+            //DatabaseController.deleteRecord(sql);
 
             // Update properties of the post
             post.setLikedByUserIds(DatabaseController.selectAllUserLikesFromPost(post));
@@ -99,7 +100,7 @@ public class UserSystemController {
             // Update numLikes column of post record
             String updateSql = DatabaseController.generateUpdateStatement("posts", "numLikes", post.getLikedByUserIds().size(), "id", post.getId());
             DatabaseController.updateRecord(updateSql);
-        });
+        // });
     }
 
     public Post getPostById(int postId) {

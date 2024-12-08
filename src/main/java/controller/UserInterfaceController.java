@@ -337,6 +337,7 @@ public class UserInterfaceController {
         Post post = UserSystemController.getInstance().getPostById(postId); // Get post from its id
 
         // Check if current user has liked already to then either like or dislike the post
+        // TODO: ISSUE IS THAT likedByUsers IS NEVER UPDATED SO FIRST CONDITION ALWAYS RETURNS TRUE
         Post updatedPost;
         if (!post.getLikedByUserIds().contains(UserSystem.getInstance().getCurrentUser().getId())) {
             UserSystemController.getInstance().userLikePost(UserSystem.getInstance().getCurrentUser(), post);
