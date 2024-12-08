@@ -124,7 +124,7 @@ public class UserInterfaceController {
         }
 
         UserSystem.getInstance().getPostsByUser(UserSystem.getInstance().getCurrentUser()).forEach(post -> {
-            String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + post.getDatePosted();
+            String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + getFormattedDateTime(post.getDatePosted());
             addPostToProfile(header, post.getText());
         });
     }
@@ -182,6 +182,7 @@ public class UserInterfaceController {
 
                 String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + getFormattedDateTime(postDate); // Create the header
                 addPostToFeed(header, postContent); // Add to the feed visually
+                addPostToProfile(header, postContent);
             }
         });
     }
@@ -225,35 +226,6 @@ public class UserInterfaceController {
         feedVBox.getChildren().add(1, postBox); // Add at the top of the feed
     }
 
-    @FXML
-    void handleHomeButton() {
-        userTabPane.getSelectionModel().select(0);
-    }
-
-    @FXML
-    void handleSearchButton() {
-        userTabPane.getSelectionModel().select(1);
-    }
-
-    @FXML
-    void handleProfileButton() {
-        userTabPane.getSelectionModel().select(2); // Switch to the profile tab
-
-        // Clear the existing content in profileVBox to avoid duplicates
-//        profileVBox.getChildren().clear();
-//        profileVBox.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;");
-//        profileVBox.setSpacing(5);
-//
-//        // Retrieve the current user's posts
-//        UserSystem.getInstance().getCurrentUser().getPosts().forEach(post -> {
-//            // Create a header with the user's name and the post date
-//            String headerText = UserSystem.getInstance().getCurrentUser().getName() + " - " + post.getDatePosted();
-//
-//            // Add the post to the profile view
-//            addPostToProfile(headerText, post.getText(), post.getId());
-//        });
-    }
-
     // Helper method to add a post to the profileVBox
     private void addPostToProfile(String headerText, String postContent) {
         // Create a VBox for the post
@@ -293,7 +265,36 @@ public class UserInterfaceController {
         postBox.getChildren().addAll(headerLabel, contentLabel, reactionBox);
 
         // Add the post VBox to the profile container
-        profileVBox.getChildren().add(postBox);
+        profileVBox.getChildren().add(1, postBox);
+    }
+
+    @FXML
+    void handleHomeButton() {
+        userTabPane.getSelectionModel().select(0);
+    }
+
+    @FXML
+    void handleSearchButton() {
+        userTabPane.getSelectionModel().select(1);
+    }
+
+    @FXML
+    void handleProfileButton() {
+        userTabPane.getSelectionModel().select(2); // Switch to the profile tab
+
+        // Clear the existing content in profileVBox to avoid duplicates
+//        profileVBox.getChildren().clear();
+//        profileVBox.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;");
+//        profileVBox.setSpacing(5);
+//
+//        // Retrieve the current user's posts
+//        UserSystem.getInstance().getCurrentUser().getPosts().forEach(post -> {
+//            // Create a header with the user's name and the post date
+//            String headerText = UserSystem.getInstance().getCurrentUser().getName() + " - " + post.getDatePosted();
+//
+//            // Add the post to the profile view
+//            addPostToProfile(headerText, post.getText(), post.getId());
+//        });
     }
 
     // Method to handle removing a post
