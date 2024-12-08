@@ -112,7 +112,7 @@ public class UserInterfaceController {
             String username = UserSystem.getInstance().getUserById(post.getUserId());
 
             String header = username + " - " + getFormattedDateTime(postDate);
-            addPostToFeed(header, post.getText(), post.getId());
+            addPostToFeed(header, post.getText(), post);
         });
     }
 
@@ -128,7 +128,7 @@ public class UserInterfaceController {
 
         UserSystem.getInstance().getPostsByUser(UserSystem.getInstance().getCurrentUser()).forEach(post -> {
             String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + getFormattedDateTime(post.getDatePosted());
-            addPostToProfile(header, post.getText(), post.getId());
+            addPostToProfile(header, post.getText(), post);
         });
     }
 
@@ -179,27 +179,14 @@ public class UserInterfaceController {
             if (!postContent.trim().isEmpty()) {
                 var currentUser = UserSystem.getInstance().getCurrentUser();
                 UserSystemController.getInstance().userPost(currentUser, postContent); // Update the backend
-//                int postId = UserSystem.getInstance().getAllPosts().isEmpty() ? 1 : UserSystem.getInstance().getAllPosts().getLast().getId();
-//                UserSystem.getInstance().getCurrentUser().post(postContent); // Update the backend
-//                Date postDate = new Date();
-//
-//                String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + getFormattedDateTime(postDate); // Create the header
-//                addPostToFeed(header, postContent, postId); // Add to the feed visually
-//                addPostToProfile(header, postContent, postId);
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Post Created");
-                alert.setHeaderText(null);
-                alert.setContentText(String.valueOf(UserSystem.getInstance().getAllPosts().size()));
-                alert.showAndWait();
-
+                
                 loadFeed();
                 loadProfile();
             }
         });
     }
 
-    private void addPostToFeed(String headerText, String postContent, int postId) {
+    private void addPostToFeed(String headerText, String postContent, Post post) {
         // Create a VBox for the post
         VBox postBox = new VBox();
         postBox.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;");
@@ -239,7 +226,7 @@ public class UserInterfaceController {
     }
 
     // Helper method to add a post to the profileVBox
-    private void addPostToProfile(String headerText, String postContent, int postId) {
+    private void addPostToProfile(String headerText, String postContent, Post post) {
         // Create a VBox for the post
         VBox postBox = new VBox();
         postBox.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;");
@@ -268,12 +255,7 @@ public class UserInterfaceController {
         Button likeButton = new Button("👍");
 //        likeButton.setOnAction(event -> handleLikeButton(counterLabel, postId));
         Button removeButton = new Button("🗑");
-        removeButton.setOnAction(event -> {
-                    handleRemovePost(UserSystemController.getInstance().getPostById(postId));
-                    postBox.getChildren().remove(postBox);
-                    loadProfile();
-                    loadFeed();
-        });
+        removeButton.setOnAction(event -> handleRemovePost(post));
 
         // Add reaction elements to HBox
         reactionBox.getChildren().addAll(counterLabel, likeButton, removeButton);

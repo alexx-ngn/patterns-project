@@ -39,12 +39,14 @@ public class UserSystemController {
     }
 
     public void userRemovePost(UserAccount userAccount, Post post) {
-        threadPool.submit(() -> {
-            userSystem.getAllPosts().remove(post);
-            userAccount.removePost(post);
+//        threadPool.submit(() -> {
             String sql = DatabaseController.generateDeleteStatement("posts", "id", post.getId());
             DatabaseController.deleteRecord(sql);
-        });
+
+            userSystem.getAllPosts().remove(post);
+            userAccount.removePost(post);
+
+//        });
     }
 
     public void userFollowUser(UserAccount follower, UserAccount followed) {
