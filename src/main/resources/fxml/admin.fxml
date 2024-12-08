@@ -28,16 +28,16 @@
                <Font size="16.0" />
             </font>
          </Label>
-            <Button fx:id="openReportsButton" prefHeight="26.0" prefWidth="156.0" text="%openReports.button" />
-         <Button fx:id="closedReportsButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="132.0" text="%closedReports.button" />
-            <Button fx:id="searchButton" prefHeight="26.0" prefWidth="136.0" text="%search.button" />
-         <Button fx:id="logoutButton" alignment="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="153.0" text="%logout.button" />
+            <Button fx:id="openReportsButton" prefHeight="26.0" prefWidth="156.0" text="%openReports.button" onAction="#handleOpenReportsButton"/>
+         <Button fx:id="closedReportsButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="132.0" text="%closedReports.button" onAction="#handleClosedReportsButton"/>
+            <Button fx:id="searchButton" prefHeight="26.0" prefWidth="136.0" text="%search.button" onAction="#handleSearchButton"/>
+         <Button fx:id="logoutButton" onAction="#handleLogoutButton" alignment="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="153.0" text="%logout.button" />
         </VBox>
     </left>
 
     <!-- Center Content -->
     <center>
-      <TabPane prefHeight="200.0" prefWidth="1206.0" tabClosingPolicy="UNAVAILABLE">
+      <TabPane fx:id="adminTabPane" prefHeight="200.0" prefWidth="1206.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
           <Tab id="homeTab" text="Open Reports">
             <content>
@@ -137,7 +137,7 @@
                                                    </font>
                                                 </Label>
                                                 <TextField fx:id="searchTextField" prefHeight="35.0" prefWidth="242.0" />
-                                                <Button fx:id="searchProfileButton" mnemonicParsing="false" prefHeight="34.0" prefWidth="98.0" text="%search.button" />
+                                                <Button fx:id="searchProfileButton" mnemonicParsing="false" prefHeight="34.0" prefWidth="98.0" text="%search.button" onAction="#handleSearchProfileButton"/>
                                              </children>
                                           </HBox>
                                           <ListView fx:id="searchListView" prefHeight="555.0" prefWidth="1171.0" />

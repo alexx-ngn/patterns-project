@@ -30,6 +30,11 @@ public class ReportSystemController {
         return instance;
     }
 
+    public AdminAccount getAdminByUsername(String username) {
+        String sql = DatabaseController.generateSelectStatement("admins", "username", username);
+        return DatabaseController.selectAdminRecord(sql).getFirst();
+    }
+
     public void addAdmin(AdminAccount adminAccount) {
         threadPool.submit(() -> {
             reportSystem.getAdminAccounts().add(adminAccount);

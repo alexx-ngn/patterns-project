@@ -2,16 +2,19 @@ package controller;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.application.Platform;
 import model.Post;
+import model.UserAccount;
 import model.UserSystem;
 import view.LoginInterface;
 
@@ -22,6 +25,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import static javafx.scene.layout.Priority.ALWAYS;
 
 public class UserInterfaceController {
     @FXML
@@ -55,9 +60,6 @@ public class UserInterfaceController {
     private Label searchLabel;
 
     @FXML
-    private ListView<?> searchListView;
-
-    @FXML
     private Button searchProfileButton;
 
     @FXML
@@ -68,6 +70,9 @@ public class UserInterfaceController {
 
     @FXML
     private VBox feedVBox;
+
+    @FXML
+    private VBox searchVBox;
 
     @FXML
     private VBox profileVBox;
@@ -111,6 +116,12 @@ public class UserInterfaceController {
         });
     }
 
+    private void loadSearch() {
+        searchVBox.getChildren().removeIf(node -> searchVBox.getChildren().indexOf(node) > 0);
+
+        UserSystem.getInstance().getUserAccounts().forEach(this::addProfilesToSearch);
+    }
+
     private void loadProfile() {
         profileVBox.getChildren().removeIf(node -> node instanceof VBox);
 
@@ -146,6 +157,7 @@ public class UserInterfaceController {
             locale = LanguageManager.getInstance().getCurrentLocale();
         }
         loadFeed();
+        loadSearch();
         loadProfile();
         updateLabels();
         hideTabs();
@@ -192,7 +204,7 @@ public class UserInterfaceController {
 
         // Create the HBox for reactions
         HBox reactionBox = new HBox();
-        reactionBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+        reactionBox.setAlignment(Pos.CENTER_RIGHT);
         reactionBox.setSpacing(5);
         reactionBox.setPrefSize(1134, 35);
 
@@ -200,12 +212,12 @@ public class UserInterfaceController {
         Label counterLabel = new Label("0");
         counterLabel.setStyle("-fx-padding: 10;");
         Button likeButton = new Button("👍");
-        likeButton.setOnAction(event -> handleLikeButton(counterLabel, postId));
+        likeButton.setOnAction(event -> handleLikeButton(counterLabel, post));
         Button reportButton = new Button("⚠");
         reportButton.setOnAction(event -> handleReportButton(post));
 
         // Update counterLabel value
-        Post post = UserSystemController.getInstance().getPostById(postId);
+//        Post post = UserSystemController.getInstance().getPostById(post.getId());
         counterLabel.setText("" + post.getLikes());
 
         // Add reaction elements to HBox
@@ -239,6 +251,28 @@ public class UserInterfaceController {
         loadFeed();
     }
 
+    private void handleReportButton(UserAccount user) {
+        TextInputDialog dialog = new TextInputDialog();
+        //TODO SET LOCALIZATION
+        dialog.setTitle("Report User");
+        dialog.setHeaderText("Please provide a reason for reporting this user:");
+
+        TextArea reasonTextArea = new TextArea();
+        reasonTextArea.setWrapText(true);
+        dialog.getDialogPane().setContent(reasonTextArea);
+
+        dialog.showAndWait().ifPresent(reason -> {
+            String reportReason = reasonTextArea.getText();
+            if (!reportReason.trim().isEmpty()) {
+                UserSystemController.getInstance().reportUser(UserSystem.getInstance().getCurrentUser(), user, reportReason);
+                loadSearch();
+            }
+        });
+
+        // Refresh the search view to reflect the changes
+        loadSearch();
+    }
+
 
     // Helper method to add a post to the profileVBox
     private void addPostToProfile(String headerText, String postContent, Post post) {
@@ -259,7 +293,7 @@ public class UserInterfaceController {
 
         // Create the HBox for reactions
         HBox reactionBox = new HBox();
-        reactionBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+        reactionBox.setAlignment(Pos.CENTER_RIGHT);
         reactionBox.setSpacing(5);
         reactionBox.setPrefSize(1134, 35);
 
@@ -268,12 +302,12 @@ public class UserInterfaceController {
 //        counterLabel.setText(String.valueOf(handleLikeButton(counterLabel, postId)));
         counterLabel.setStyle("-fx-padding: 10;");
         Button likeButton = new Button("👍");
-        likeButton.setOnAction(event -> handleLikeButton(counterLabel, postId));
+        likeButton.setOnAction(event -> handleLikeButton(counterLabel, post));
         Button removeButton = new Button("🗑");
         removeButton.setOnAction(event -> handleRemovePost(post));
 
         // Update counterLabel value
-        Post post = UserSystemController.getInstance().getPostById(postId);
+//        Post updatedPost = UserSystemController.getInstance().getPostById(post.getId());
         counterLabel.setText("" + post.getLikes());
 
         // Add reaction elements to HBox
@@ -284,6 +318,32 @@ public class UserInterfaceController {
 
         // Add the post VBox to the profile container
         profileVBox.getChildren().add(1, postBox);
+    }
+
+    private void addProfilesToSearch(UserAccount user) {
+        // Create Label
+        Label usernameLabel = new Label(user.getUsername());
+        usernameLabel.setFont(new Font(20.0));
+
+        //Create Region
+        Region region = new Region();
+        HBox.setHgrow(region, ALWAYS);
+
+        // Create Button
+        Button warningButton = new Button("⚠");
+        warningButton.setMnemonicParsing(false);
+        warningButton.setPrefSize(54.0, 33.0);
+
+        // Handle the report button
+        warningButton.setOnAction(event -> handleReportButton(user));
+
+        // Create HBox
+        HBox hbox = new HBox(10.0); // Spacing of 10.0
+        hbox.setPrefSize(1150.0, 17.0);
+        hbox.getChildren().addAll(usernameLabel, region, warningButton);
+
+        // Add HBox to searchVBox
+        searchVBox.getChildren().add(hbox);
     }
 
     @FXML
@@ -323,22 +383,16 @@ public class UserInterfaceController {
     }
 
     @FXML
-    private void handleLikeButton(Label counterLabel, int postId) {
-        Post post = UserSystemController.getInstance().getPostById(postId); // Get post from its id
-
+    private void handleLikeButton(Label counterLabel, Post post) {
         // Check if current user has liked already to then either like or dislike the post
-        // TODO: ISSUE IS THAT likedByUsers IS NEVER UPDATED SO FIRST CONDITION ALWAYS RETURNS TRUE
-        Post updatedPost;
         if (!post.getLikedByUserIds().contains(UserSystem.getInstance().getCurrentUser().getId())) {
             UserSystemController.getInstance().userLikePost(UserSystem.getInstance().getCurrentUser(), post);
-            updatedPost = UserSystemController.getInstance().getPostById(postId);
-        } else {
+        } else if (post.getLikedByUserIds().contains(UserSystem.getInstance().getCurrentUser().getId())){
             UserSystemController.getInstance().userUnlikePost(UserSystem.getInstance().getCurrentUser(), post);
-            updatedPost = UserSystemController.getInstance().getPostById(postId);
         }
 
         // Refresh to load changes
-        Platform.runLater(() -> counterLabel.setText("" + updatedPost.getLikes()));
+        Platform.runLater(() -> counterLabel.setText("" + post.getLikedByUserIds().size()));
         loadFeed();
     }
 }

@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -145,7 +144,7 @@
                            <content>
                               <AnchorPane>
                                  <children>
-                                    <VBox>
+                                    <VBox fx:id="searchVBox">
                                        <children>
                                           <HBox>
                                              <children>
@@ -158,7 +157,16 @@
                                                 <Button fx:id="searchProfileButton" mnemonicParsing="false" prefHeight="34.0" prefWidth="98.0" text="%search.button" />
                                              </children>
                                           </HBox>
-                                          <ListView fx:id="searchListView" prefHeight="586.0" prefWidth="1171.0" />
+                                          <HBox prefHeight="17.0" prefWidth="1150.0" spacing="10.0">
+                                             <children>
+                                                <Label text="Username">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Label>
+                                                <Button mnemonicParsing="false" prefHeight="33.0" prefWidth="54.0" text="⚠" />
+                                             </children>
+                                          </HBox>
                                        </children>
                                     </VBox>
                                  </children>

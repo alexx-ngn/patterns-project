@@ -738,4 +738,69 @@ public class DatabaseController {
             READ_LOCK.unlock();
         }
     }
+
+    public static List<UserAccount> selectUserRecord(String sql) {
+        if (!sql.toUpperCase().contains("SELECT")) {
+            throw new IllegalArgumentException("SQL statement must be a SELECT statement");
+        }
+        return executeSelectUser(sql);
+    }
+
+    private static List<UserAccount> executeSelectUser(String sql) {
+        READ_LOCK.lock();
+        try (Connection connection = connect(DB_PATH);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+
+            List<UserAccount> results = new ArrayList<>();
+            while (resultSet.next()) {
+                UserAccount user = new UserAccount(
+                        resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("email"),
+                        resultSet.getString("username"),
+                        resultSet.getString("password"),
+                        resultSet.getInt("numFollowers")
+                );
+                results.add(user);
+            }
+            return results;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            READ_LOCK.unlock();
+        }
+    }
+
+    public static List<AdminAccount> selectAdminRecord(String sql) {
+        if (!sql.toUpperCase().contains("SELECT")) {
+            throw new IllegalArgumentException("SQL statement must be a SELECT statement");
+        }
+        return executeSelectAdmin(sql);
+    }
+
+    private static List<AdminAccount> executeSelectAdmin(String sql) {
+        READ_LOCK.lock();
+        try (Connection connection = connect(DB_PATH);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+
+            List<AdminAccount> results = new ArrayList<>();
+            while (resultSet.next()) {
+                AdminAccount admin = new AdminAccount(
+                        resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("email"),
+                        resultSet.getString("username"),
+                        resultSet.getString("password")
+                );
+                results.add(admin);
+            }
+            return results;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            READ_LOCK.unlock();
+        }
+    }
 }

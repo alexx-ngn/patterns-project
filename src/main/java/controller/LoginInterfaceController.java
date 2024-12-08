@@ -8,6 +8,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import model.Report;
+import model.ReportSystem;
 import model.UserSystem;
 import view.RegisterInterface;
 
@@ -45,9 +47,30 @@ public class LoginInterfaceController {
 
     @FXML
     void handleLoginButton(ActionEvent event) {
-        // TODO: ADMIN LOGIN
-        boolean loginSuccessful = UserSystem.getInstance().authenticateUser(usernameTextField.getText(), passwordField.getText());
-        if (loginSuccessful) {
+        boolean adminLoginSuccessful = ReportSystem.getInstance().authenticateAdmin(usernameTextField.getText(), passwordField.getText());
+        boolean userLoginSuccessful = UserSystem.getInstance().authenticateUser(usernameTextField.getText(), passwordField.getText());
+
+        if (adminLoginSuccessful) {
+            // Set current admin of application
+            ReportSystem.getInstance().setCurrentAdmin(ReportSystemController.getInstance().getAdminByUsername(usernameTextField.getText()));
+            Locale currentLocale = LanguageManager.getInstance().getCurrentLocale();
+
+            this.loginPane.getScene().getWindow().hide();
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/admin.fxml"));
+                loader.setResources(ResourceBundle.getBundle("lang.Admin", currentLocale));
+                Parent root = loader.load();
+
+                Stage stage = new Stage();
+                stage.setScene(new Scene(root));
+                stage.show();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else if (userLoginSuccessful) {
+            // Set current user of application
+            UserSystem.getInstance().setCurrentUser(UserSystemController.getInstance().getUserByUsername(usernameTextField.getText()));
             Locale currentLocale = LanguageManager.getInstance().getCurrentLocale();
 
             this.loginPane.getScene().getWindow().hide();

@@ -15,6 +15,9 @@ public class ReportSystem {
     private Queue<Report> openReports;
     private List<Report> closedReports;
 
+    @Getter
+    private AdminAccount currentAdmin = null;
+
     private static ReportSystem instance;
 
     private ReportSystem() {
@@ -34,11 +37,12 @@ public class ReportSystem {
         return instance;
     }
 
-    private static boolean authenticateAdmin(String username, String password) {
+    public boolean authenticateAdmin(String username, String password) {
         boolean success = false;
         for (AdminAccount admin : getInstance().adminAccounts) {
             if (admin.getUsername().equals(username) && admin.getPassword().equals(password)) {
                 success = true;
+                currentAdmin = admin;
                 break;
             }
         }
