@@ -3,9 +3,9 @@ package controller;
 import model.*;
 
 import java.sql.*;
-import java.sql.Date;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.Date;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DatabaseController {
