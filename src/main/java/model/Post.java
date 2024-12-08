@@ -22,6 +22,7 @@ public class Post {
         this.text = text;
         this.likes = 0;
         this.usersLiked = new HashSet<>();
+        this.datePosted = new Date();
         // id, dateposted handled in database
     }
 
