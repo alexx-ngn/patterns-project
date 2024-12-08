@@ -2,7 +2,7 @@ package model;
 
 import lombok.*;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,11 +17,13 @@ public class Post {
     private Set<UserAccount> usersLiked;
     private Date datePosted;
 
-    public Post(String text) {
+    public Post(int userId, String text) {
         this.id = 0;
+        this.userId = userId;
         this.text = text;
         this.likes = 0;
         this.usersLiked = new HashSet<>();
+        this.datePosted = new Date();
         // id, dateposted handled in database
     }
 
@@ -31,5 +33,6 @@ public class Post {
         this.text = text;
         this.likes = likes;
         this.usersLiked = new HashSet<>();
+        this.datePosted = datePosted;
     }
 }

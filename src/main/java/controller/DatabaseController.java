@@ -3,8 +3,9 @@ package controller;
 import model.*;
 
 import java.sql.*;
-import java.sql.Date;
+import java.text.DateFormat;
 import java.util.*;
+import java.util.Date;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DatabaseController {
@@ -49,7 +50,7 @@ public class DatabaseController {
                 email TEXT NOT NULL UNIQUE,
                 username TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
-                numFollowers INTEGER DEFAULT 0,
+                numFollowers INTEGER DEFAULT 0
             )
             """;
 
@@ -59,6 +60,7 @@ public class DatabaseController {
                 userId INTEGER NOT NULL,
                 content TEXT NOT NULL,
                 numLikes INTEGER DEFAULT 0,
+                datePosted INTEGER NOT NULL,
                 FOREIGN KEY (userId) REFERENCES users(id)
             )
             """;
@@ -88,13 +90,14 @@ public class DatabaseController {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 reason TEXT NOT NULL,
                 status TEXT NOT NULL,
-                date DATE NOT NULL,
+                date INTEGER NOT NULL,
                 adminId INTEGER,
+                creationDate INTEGER NOT NULL,
                 reporterId INTEGER NOT NULL,
                 reporteeId INTEGER NOT NULL,
                 FOREIGN KEY (adminId) REFERENCES admins(id),
                 FOREIGN KEY (reporterId) REFERENCES users(id),
-                FOREIGN KEY (reporteeId) REFERENCES users(id),
+                FOREIGN KEY (reporteeId) REFERENCES users(id)
             )
             """; //Possibly change adminId to be not null?
 
@@ -103,13 +106,14 @@ public class DatabaseController {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 reason TEXT NOT NULL,
                 status TEXT NOT NULL,
-                date DATE NOT NULL,
+                date INTEGER NOT NULL,
                 adminId INTEGER,
                 reporterId INTEGER NOT NULL,
                 postId INTEGER NOT NULL,
+                creationDate, INTEGER NOT NULL,
                 FOREIGN KEY (adminId) REFERENCES admins(id),
                 FOREIGN KEY (reporterId) REFERENCES users(id),
-                FOREIGN KEY (postId) REFERENCES posts(id),
+                FOREIGN KEY (postId) REFERENCES posts(id)
             )
             """; //Possibly change adminId to be not null?
 
@@ -137,6 +141,16 @@ public class DatabaseController {
             throw new IllegalArgumentException("SQL statement must be a CREATE statement");
         }
         executeDdlAndDml(sql);
+    }
+
+    public static void createAllTables() {
+        createTable(CREATE_ADMIN_TABLE);
+        createTable(CREATE_USER_TABLE);
+        createTable(CREATE_POST_TABLE);
+        createTable(CREATE_FOLLOW_TABLE);
+        createTable(CREATE_LIKE_TABLE);
+        createTable(CREATE_USER_REPORT_TABLE);
+        createTable(CREATE_POST_REPORT_TABLE);
     }
 
     /**
@@ -198,11 +212,36 @@ public class DatabaseController {
      * Selects a record from a table
      * @param sql the SELECT statement to execute
      */
-    public static void selectRecord(String sql) {
+    public static List<Post> selectRecord(String sql) {
         if (!sql.toUpperCase().contains("SELECT")) {
             throw new IllegalArgumentException("SQL statement must be a SELECT statement");
         }
-        executeDdlAndDml(sql);
+        return executeSelectPosts(sql);
+    }
+
+    private static List<Post> executeSelectPosts(String sql) {
+        READ_LOCK.lock();
+        try (Connection connection = connect(DB_PATH);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+
+            List<Post> results = new ArrayList<>();
+            while (resultSet.next()) {
+                Post post = new Post(
+                        resultSet.getInt("id"),
+                        resultSet.getInt("userId"),
+                        resultSet.getString("content"),
+                        resultSet.getInt("numLikes"),
+                        new Date(resultSet.getLong("datePosted") * 1000L)
+                );
+                results.add(post);
+            }
+            return results;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            READ_LOCK.unlock();
+        }
     }
 
     /**
@@ -446,8 +485,8 @@ public class DatabaseController {
                 String email = resultSet.getString("email");
                 String username = resultSet.getString("username");
                 String password = resultSet.getString("password");
-                Date creationDate = resultSet.getDate("creationDate");
-                AdminAccount admin = new AdminAccount(id, name, email, username, password, creationDate);
+
+                AdminAccount admin = new AdminAccount(id, name, email, username, password);
                 admins.add(admin);
             }
         } catch (SQLException e) {
@@ -477,9 +516,8 @@ public class DatabaseController {
                 String email = resultSet.getString("email");
                 String username = resultSet.getString("username");
                 String password = resultSet.getString("password");
-                Date creationDate = resultSet.getDate("creationDate");
                 int numFollowers = resultSet.getInt("numFollowers");
-                UserAccount user = new UserAccount(id, name, email, username, password, creationDate, numFollowers);
+                UserAccount user = new UserAccount(id, name, email, username, password, numFollowers);
                 searchResults.add(user);
             }
         } catch (SQLException e) {
@@ -509,11 +547,7 @@ public class DatabaseController {
         return getUserAccounts(sql);
     }
 
-    /**
-     * Selects all posts from the database
-     * @return a list of all posts for the user account
-     */
-    public static List<Post> selectAllPosts () {
+    public static List<Post> selectAllPosts() {
         READ_LOCK.lock();
         String sql = "SELECT * FROM posts";
 
@@ -525,9 +559,9 @@ public class DatabaseController {
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 int userId = resultSet.getInt("userId");
-                String text = resultSet.getString("text");
-                int likes = resultSet.getInt("likes");
-                Date datePosted = resultSet.getDate("datePosted");
+                String text = resultSet.getString("content");
+                int likes = resultSet.getInt("numLikes");
+                Date datePosted = new Date(resultSet.getLong("datePosted") * 1000L);
                 Post post = new Post(id, userId, text, likes, datePosted);
                 posts.add(post);
             }
@@ -546,7 +580,7 @@ public class DatabaseController {
      */
     public static List<Post> selectAllPosts (UserAccount account) {
         READ_LOCK.lock();
-        String sql = "SELECT * FROM posts"  + " WHERE userId = " + account.getId();
+        String sql = "SELECT * FROM posts" + " WHERE userId = " + account.getId();
 
         List<Post> posts = new ArrayList<>();
         try (Connection connection = connect(DB_PATH);
@@ -556,9 +590,9 @@ public class DatabaseController {
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 int userId = resultSet.getInt("userId");
-                String text = resultSet.getString("text");
-                int likes = resultSet.getInt("likes");
-                Date datePosted = resultSet.getDate("datePosted");
+                String text = resultSet.getString("content");
+                int likes = resultSet.getInt("numLikes");
+                Date datePosted = new Date(resultSet.getLong("datePosted") * 1000L);
                 Post post = new Post(id, userId, text, likes, datePosted);
                 posts.add(post);
             }

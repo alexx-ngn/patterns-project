@@ -1,19 +1,35 @@
 package controller;
 
-import model.AdminAccount;
+import lombok.Getter;
 import model.Post;
+import model.ReportSystem;
 import model.UserAccount;
 import model.UserSystem;
 
+import java.time.Instant;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Getter
 public class UserSystemController {
     private UserSystem userSystem;
     private static ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
-    public UserSystemController() {
+    private static UserSystemController instance;
+
+    private UserSystemController() {
         userSystem = UserSystem.getInstance();
+    }
+
+    public static UserSystemController getInstance() {
+        if (instance == null) {
+            synchronized (UserSystemController.class) {
+                if (instance == null) {
+                    instance = new UserSystemController();
+                }
+            }
+        }
+        return instance;
     }
 
     public void addUser(UserAccount userAccount) {
@@ -27,8 +43,8 @@ public class UserSystemController {
 
     public void userRemovePost(UserAccount userAccount, Post post) {
         threadPool.submit(() -> {
+            userSystem.getAllPosts().remove(post);
             userAccount.removePost(post);
-            userSystem.getPosts().remove(post);
             String sql = DatabaseController.generateDeleteStatement("posts", "id", post.getId());
             DatabaseController.deleteRecord(sql);
         });
@@ -45,8 +61,10 @@ public class UserSystemController {
     public void userPost(UserAccount userAccount, String text) {
         threadPool.submit(() -> {
             Post post = userAccount.post(text);
-            userSystem.getPosts().add(post);
-            String sql = DatabaseController.generateInsertStatement("posts", post.getUserId(), post.getText(), post.getUsersLiked());
+            userSystem.getAllPosts().add(post);
+            userAccount.getPosts().add(post);
+            String sql = DatabaseController.generateInsertStatement("posts", post.getUserId(), post.getText(),
+                    post.getUsersLiked().size(), Instant.now().getEpochSecond());
             DatabaseController.insertRecord(sql);
         });
     }
@@ -62,19 +80,8 @@ public class UserSystemController {
         });
     }
 
-    public void adminRemovePost(Post post) {
-        threadPool.submit(() -> {
-            userSystem.getPosts().remove(post);
-            String sql = DatabaseController.generateDeleteStatement("posts", "id", post.getId());
-            DatabaseController.deleteRecord(sql);
-        });
-    }
-
-    public void adminBanUser(AdminAccount adminAccount, UserAccount userAccount) {
-        threadPool.submit(() -> {
-            userSystem.getUserAccounts().remove(userAccount);
-            String sql = DatabaseController.generateDeleteStatement("post_reports", "id", userAccount.getId());
-            DatabaseController.deleteRecord(sql);
-        });
+    public Post getPostById(int postId) {
+        String sql = DatabaseController.generateSelectStatement("posts", "id", postId);
+        return DatabaseController.selectRecord(sql).getFirst();
     }
 }
