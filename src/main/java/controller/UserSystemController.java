@@ -56,14 +56,16 @@ public class UserSystemController {
     }
 
     public void userPost(UserAccount userAccount, String text) {
-        threadPool.submit(() -> {
+//        threadPool.submit(() -> {
             Post post = userAccount.post(text);
+            String sql = DatabaseController.generateInsertStatement("posts", post.getUserId(), post.getText(),
+                post.getUsersLiked().size(), Instant.now().getEpochSecond());
+            DatabaseController.insertRecord(sql);
+
             userSystem.getAllPosts().add(post);
             userAccount.getPosts().add(post);
-            String sql = DatabaseController.generateInsertStatement("posts", post.getUserId(), post.getText(),
-                    post.getUsersLiked().size(), Instant.now().getEpochSecond());
-            DatabaseController.insertRecord(sql);
-        });
+
+//        });
     }
 
     public void userLikePost(UserAccount userAccount, Post post) {
@@ -98,5 +100,17 @@ public class UserSystemController {
             String sql = DatabaseController.generateDeleteStatement("post_reports", "id", userAccount.getId());
             DatabaseController.deleteRecord(sql);
         });
+    }
+
+    public int getLastPostId() {
+//        if (userSystem.getAllPosts().isEmpty()) {
+////            return 1;
+////        }
+////        return userSystem.getAllPosts().getLast().getId();
+        threadPool.submit(() -> {
+            String sql = "SELECT id FROM posts ORDER BY id DESC LIMIT 1";
+            return DatabaseController.selectPostRecord(sql).getFirst().getId();
+        });
+        return 1;
     }
 }

@@ -98,12 +98,13 @@ public class UserInterfaceController {
     }
 
     private void loadFeed() {
-        for (int i = 0; i < feedVBox.getChildren().size(); i++) {
-            if (feedVBox.getChildren().get(i) instanceof VBox) {
-                feedVBox.getChildren().remove(i);
-                i--;
-            }
-        }
+//        for (int i = 0; i < feedVBox.getChildren().size(); i++) {
+//            if (feedVBox.getChildren().get(i) instanceof VBox) {
+//                feedVBox.getChildren().remove(i);
+//                i--;
+//            }
+//        }
+        feedVBox.getChildren().removeIf(node -> node instanceof VBox);
 
         UserSystem.getInstance().getAllPosts().forEach(post -> {
             // Get the current date and time
@@ -116,12 +117,14 @@ public class UserInterfaceController {
     }
 
     private void loadProfile() {
-        for (int i = 0; i < profileVBox.getChildren().size(); i++) {
-            if (profileVBox.getChildren().get(i) instanceof VBox) {
-                profileVBox.getChildren().remove(i);
-                i--;
-            }
-        }
+//        for (int i = 0; i < profileVBox.getChildren().size(); i++) {
+//            if (profileVBox.getChildren().get(i) instanceof VBox) {
+//                profileVBox.getChildren().remove(i);
+//                i--;
+//            }
+//        }
+
+        profileVBox.getChildren().removeIf(node -> node instanceof VBox);
 
         UserSystem.getInstance().getPostsByUser(UserSystem.getInstance().getCurrentUser()).forEach(post -> {
             String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + getFormattedDateTime(post.getDatePosted());
@@ -176,13 +179,22 @@ public class UserInterfaceController {
             if (!postContent.trim().isEmpty()) {
                 var currentUser = UserSystem.getInstance().getCurrentUser();
                 UserSystemController.getInstance().userPost(currentUser, postContent); // Update the backend
-                int postId = UserSystem.getInstance().getAllPosts().isEmpty() ? 1 : UserSystem.getInstance().getAllPosts().getLast().getId();
-                UserSystem.getInstance().getCurrentUser().post(postContent); // Update the backend
-                Date postDate = new Date();
+//                int postId = UserSystem.getInstance().getAllPosts().isEmpty() ? 1 : UserSystem.getInstance().getAllPosts().getLast().getId();
+//                UserSystem.getInstance().getCurrentUser().post(postContent); // Update the backend
+//                Date postDate = new Date();
+//
+//                String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + getFormattedDateTime(postDate); // Create the header
+//                addPostToFeed(header, postContent, postId); // Add to the feed visually
+//                addPostToProfile(header, postContent, postId);
 
-                String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + getFormattedDateTime(postDate); // Create the header
-                addPostToFeed(header, postContent, postId); // Add to the feed visually
-                addPostToProfile(header, postContent, postId);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Post Created");
+                alert.setHeaderText(null);
+                alert.setContentText(String.valueOf(UserSystem.getInstance().getAllPosts().size()));
+                alert.showAndWait();
+
+                loadFeed();
+                loadProfile();
             }
         });
     }

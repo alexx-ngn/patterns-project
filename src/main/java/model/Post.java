@@ -12,7 +12,7 @@ import java.util.Set;
 @EqualsAndHashCode
 public class Post {
     private int id;
-//    private static int nextId = UserSystemController.getInstance().getLastPostId() == 0 ? 1 : UserSystemController.getInstance().getLastPostId();
+    private static int nextId;
     private int userId;
     private String text;
     private int likes;
@@ -20,7 +20,8 @@ public class Post {
     private Date datePosted;
 
     public Post(int userId, String text) {
-//        this.id = nextId++;
+        nextId = UserSystem.getInstance().getAllPosts().size() + 1;
+        this.id = nextId++;
         this.userId = userId;
         this.text = text;
         this.likes = 0;
