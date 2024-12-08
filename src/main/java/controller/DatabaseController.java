@@ -211,36 +211,11 @@ public class DatabaseController {
      * Selects a record from a table
      * @param sql the SELECT statement to execute
      */
-    public static List<Post> selectPostsRecord(String sql) {
+    public static void selectRecord(String sql) {
         if (!sql.toUpperCase().contains("SELECT")) {
             throw new IllegalArgumentException("SQL statement must be a SELECT statement");
         }
-        return executeSelectPosts(sql);
-    }
-
-    private static List<Post> executeSelectPosts(String sql) {
-        READ_LOCK.lock();
-        try (Connection connection = connect(DB_PATH);
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
-
-            List<Post> results = new ArrayList<>();
-            while (resultSet.next()) {
-                Post post = new Post(
-                        resultSet.getInt("id"),
-                        resultSet.getInt("userId"),
-                        resultSet.getString("content"),
-                        resultSet.getInt("numLikes"),
-                        new Date(resultSet.getLong("datePosted") * 1000L)
-                );
-                results.add(post);
-            }
-            return results;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            READ_LOCK.unlock();
-        }
+        executeDdlAndDml(sql);
     }
 
     /**
@@ -721,5 +696,41 @@ public class DatabaseController {
             READ_LOCK.unlock();
         }
         return likes;
+    }
+
+    /**
+     * Selects a post record from a table
+     * @param sql the SELECT statement to execute
+     */
+    public static List<Post> selectPostRecord(String sql) {
+        if (!sql.toUpperCase().contains("SELECT")) {
+            throw new IllegalArgumentException("SQL statement must be a SELECT statement");
+        }
+        return executeSelectPosts(sql);
+    }
+
+    private static List<Post> executeSelectPosts(String sql) {
+        READ_LOCK.lock();
+        try (Connection connection = connect(DB_PATH);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+
+            List<Post> results = new ArrayList<>();
+            while (resultSet.next()) {
+                Post post = new Post(
+                        resultSet.getInt("id"),
+                        resultSet.getInt("userId"),
+                        resultSet.getString("content"),
+                        resultSet.getInt("numLikes"),
+                        new Date(resultSet.getLong("datePosted") * 1000L)
+                );
+                results.add(post);
+            }
+            return results;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            READ_LOCK.unlock();
+        }
     }
 }
