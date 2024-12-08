@@ -4,7 +4,7 @@
 # from the current directory and lists the files containing the keyword along with line numbers.
 
 # Define the keyword to search for
-KEYWORD=".jar"
+KEYWORD="currentUser"
 
 # Find all files and search for the keyword
 echo "Searching for '$KEYWORD' in files..."

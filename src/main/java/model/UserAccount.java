@@ -47,8 +47,8 @@ public class UserAccount extends Account {
      * @param text text of post
      */
     public Post post(String text) {
-        Post post = new Post(text);
-        posts.add(post);
+        Post post = new Post(this.getId(), text);
+//        posts.add(post);
         return post;
     }
 

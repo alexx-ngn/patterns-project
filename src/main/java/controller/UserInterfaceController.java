@@ -109,8 +109,22 @@ public class UserInterfaceController {
             // Get the current date and time
             Date postDate = post.getDatePosted();
 
-            String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + getFormattedDateTime(postDate);
+            String header = post.getUserId() + " - " + getFormattedDateTime(postDate);
             addPostToFeed(header, post.getText());
+        });
+    }
+
+    private void loadProfile() {
+        for (int i = 0; i < profileVBox.getChildren().size(); i++) {
+            if (profileVBox.getChildren().get(i) instanceof VBox) {
+                profileVBox.getChildren().remove(i);
+                i--;
+            }
+        }
+
+        UserSystem.getInstance().getPostsByUser(UserSystem.getInstance().getCurrentUser()).forEach(post -> {
+            String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + post.getDatePosted();
+            addPostToProfile(header, post.getText());
         });
     }
 
@@ -132,23 +146,6 @@ public class UserInterfaceController {
         } catch (UnsupportedOperationException e) {
             throw new UnsupportedOperationException("postDate is not supported for conversion: " + postDate, e);
         }
-    }
-
-    private void loadProfile() {
-        for (int i = 0; i < profileVBox.getChildren().size(); i++) {
-            if (profileVBox.getChildren().get(i) instanceof VBox) {
-                profileVBox.getChildren().remove(i);
-                i--;
-            }
-        }
-        UserSystem.getInstance().getPostsByUser(UserSystem.getInstance().getCurrentUser()).forEach(post -> {
-//            AnchorPane postPane = new AnchorPane();
-//            Label postLabel = new Label(post.getText());
-//            postPane.getChildren().add(postLabel);
-//            profileVBox.getChildren().add(postPane);
-            String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + post.getDatePosted();
-//            addPostToProfile(header, post.getText(), post.getId());
-        });
     }
 
     @FXML
@@ -176,7 +173,8 @@ public class UserInterfaceController {
         dialog.showAndWait().ifPresent(text -> {
             String postContent = textArea.getText();
             if (!postContent.trim().isEmpty()) {
-                UserSystemController.getInstance().userPost(UserSystem.getInstance().getCurrentUser(), postContent); // Update the backend
+                var currentUser = UserSystem.getInstance().getCurrentUser();
+                UserSystemController.getInstance().userPost(currentUser, postContent); // Update the backend
 //                int postId = UserSystem.getInstance().getCurrentUser().getPosts().getLast().getId();
                 UserSystem.getInstance().getCurrentUser().post(postContent); // Update the backend
                 Date postDate = UserSystem.getInstance().getCurrentUser().getPosts().getLast().getDatePosted();
@@ -256,7 +254,7 @@ public class UserInterfaceController {
     }
 
     // Helper method to add a post to the profileVBox
-    private void addPostToProfile(String headerText, String postContent, int postId) {
+    private void addPostToProfile(String headerText, String postContent) {
         // Create a VBox for the post
         VBox postBox = new VBox();
         postBox.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;");
@@ -283,9 +281,9 @@ public class UserInterfaceController {
 //        counterLabel.setText(String.valueOf(handleLikeButton(counterLabel, postId)));
         counterLabel.setStyle("-fx-padding: 10;");
         Button likeButton = new Button("👍");
-        likeButton.setOnAction(event -> handleLikeButton(counterLabel, postId));
+//        likeButton.setOnAction(event -> handleLikeButton(counterLabel, postId));
         Button removeButton = new Button("🗑");
-        removeButton.setOnAction(event -> handleRemovePost(UserSystemController.getInstance().getPostById(postId)));
+//        removeButton.setOnAction(event -> handleRemovePost(UserSystemController.getInstance().getPostById(postId)));
 
         // Add reaction elements to HBox
         reactionBox.getChildren().addAll(counterLabel, likeButton, removeButton);

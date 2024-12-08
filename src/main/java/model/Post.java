@@ -17,8 +17,9 @@ public class Post {
     private Set<UserAccount> usersLiked;
     private Date datePosted;
 
-    public Post(String text) {
+    public Post(int userId, String text) {
         this.id = 0;
+        this.userId = userId;
         this.text = text;
         this.likes = 0;
         this.usersLiked = new HashSet<>();
