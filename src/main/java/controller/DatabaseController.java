@@ -401,15 +401,28 @@ public class DatabaseController {
     public static String generateDeleteStatement(String tableName, Object... params) {
         StringBuilder sb = new StringBuilder("DELETE FROM "); // Start building the DELETE statement
         sb.append(tableName)
-                .append(" WHERE ") // Append the WHERE clause
-                .append(params[0])
-                .append(" = ");
+                .append(" WHERE "); // Append the WHERE clause
 
-        Object value = params[1];
-        value = (value instanceof String) ?
-                "'" + value + "'" : // Append string value with quotes
-                value; // Append non-string value
-        sb.append(value);
+        // Loop through params and construct conditions
+        for (int i = 0; i < params.length; i += 2) {
+            String column = (String) params[i];
+            Object value = params[i + 1];
+
+            // Add column and value condition
+            sb.append(column)
+                    .append(" = ");
+
+            if (value instanceof String) {
+                sb.append("'").append(value).append("'");
+            } else {
+                sb.append(value);
+            }
+
+            // Append "AND" if more conditions follow
+            if (i < params.length - 2) {
+                sb.append(" AND ");
+            }
+        }
 
         return sb.toString(); // Return the complete DELETE statement
     }
@@ -669,22 +682,18 @@ public class DatabaseController {
      * @param post the post to select likes for
      * @return a set of all user likes (unique)
      */
-    public static Set<UserAccount> selectAllUserLikesFromPost(Post post) {
+    public static Set<Integer> selectAllUserLikesFromPost(Post post) {
         READ_LOCK.lock();
         String sql = "SELECT * FROM likes" + " WHERE postId = " + post.getId();
 
-        Set<UserAccount> likes = new HashSet<>();
+        Set<Integer> likes = new HashSet<>();
         try (Connection connection = connect(DB_PATH);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql))
         {
             while (resultSet.next()) {
                 int userId = resultSet.getInt("userId");
-                UserAccount user = selectAllUsers().stream()
-                        .filter(u -> u.getId() == userId)
-                        .findFirst()
-                        .orElseThrow(() -> new RuntimeException("User not found"));
-                likes.add(user);
+                likes.add(userId);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
