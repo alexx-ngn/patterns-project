@@ -7,7 +7,7 @@ import java.util.Date;
 @Setter
 public abstract class Report {
     private int id;
-    private int adminId;
+    private static int nextId;
     private int reportingUserId;
     private String reason;
     private Status status;
@@ -19,9 +19,8 @@ public abstract class Report {
 
     // Constructor for Report that handles all fields, this is used for fetching data from the database and
     // creating an object. Used for creating a list when selecting all from the database.
-    public Report(int id, int adminId, int reportingUserId, Status status, String reason, Date dateReported) {
+    public Report(int id, int reportingUserId, Status status, String reason, Date dateReported) {
         this.id = id;
-        this.adminId = adminId;
         this.reportingUserId = reportingUserId;
         this.status = status;
         this.reason = reason;
@@ -29,8 +28,11 @@ public abstract class Report {
     }
 
     public Report(int reportingUserId, Status status, String reason) {
+        nextId = ReportSystem.getInstance().getOpenReports().size() + 1;
+        this.id = nextId++;
         this.status = status;
         this.reason = reason;
+        this.dateReported = new Date(System.currentTimeMillis());
         this.reportingUserId = reportingUserId;
         // TODO: adminId assigned in another method, Report.assignAdmin method ??
         // id, dateReported, handled in database

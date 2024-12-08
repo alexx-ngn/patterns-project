@@ -43,7 +43,7 @@ public class ReportSystemController {
         threadPool.submit(() -> {
             reportSystem.getOpenReports().add(userReport);
             String sql = DatabaseController.generateInsertStatement("user_reports", userReport.getReason(), userReport.getStatus().name(),
-                    userReport.getDateReported(), userReport.getAdminId(), userReport.getReportingUserId(), userReport.getReportedUserId());
+                    userReport.getDateReported(), userReport.getReportingUserId(), userReport.getReportedUserId());
             DatabaseController.insertRecord(sql);
         });
     }
@@ -52,7 +52,7 @@ public class ReportSystemController {
         threadPool.submit(() -> {
             reportSystem.getOpenReports().add(postReport);
             String sql = DatabaseController.generateInsertStatement("post_reports", postReport.getReason(), postReport.getStatus().name(),
-                    postReport.getDateReported(), postReport.getAdminId(), postReport.getReportingUserId(), postReport.getReportedPostId());
+                    postReport.getDateReported(), postReport.getReportingUserId(), postReport.getReportedPostId());
             DatabaseController.insertRecord(sql);
         });
     }

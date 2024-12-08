@@ -39,14 +39,14 @@ public class UserSystemController {
     }
 
     public void userRemovePost(UserAccount userAccount, Post post) {
-//        threadPool.submit(() -> {
+        threadPool.submit(() -> {
             String sql = DatabaseController.generateDeleteStatement("posts", "id", post.getId());
             DatabaseController.deleteRecord(sql);
 
             userSystem.getAllPosts().remove(post);
             userAccount.removePost(post);
 
-//        });
+        });
     }
 
     public void userFollowUser(UserAccount follower, UserAccount followed) {
@@ -58,7 +58,7 @@ public class UserSystemController {
     }
 
     public void userPost(UserAccount userAccount, String text) {
-//        threadPool.submit(() -> {
+        threadPool.submit(() -> {
             Post post = userAccount.post(text);
             String sql = DatabaseController.generateInsertStatement("posts", post.getUserId(), post.getText(),
                 post.getUsersLiked().size(), Instant.now().getEpochSecond());
@@ -67,13 +67,16 @@ public class UserSystemController {
             userSystem.getAllPosts().add(post);
             userAccount.getPosts().add(post);
 
-//        });
+        });
     }
 
     public void userLikePost(UserAccount userAccount, Post post) {
         threadPool.submit(() -> {
             // Insert likes record
-            String sql = DatabaseController.generateFullInsertStatement("likes", userAccount.getId(), post.getId());
+            String sql = DatabaseController.generateFullInsertStatement(
+                    "likes",
+                    userAccount.getId(),
+                    post.getId());
             DatabaseController.insertRecord(sql);
 
             // TODO: ALSO NEED TO MODIFY LIKES COUNTER
@@ -81,6 +84,23 @@ public class UserSystemController {
             // Update usersLiked property of the post
             post.setUsersLiked(DatabaseController.selectAllUserLikesFromPost(post));
         });
+    }
+
+    public void reportPost(UserAccount reporter, Post post, String reason) {
+//        threadPool.submit(() -> {
+            PostReport postReport = reporter.reportPost(post, reason);
+            String sql = DatabaseController.generateInsertStatement(
+                    "post_reports",
+                    reason,
+                    postReport.getStatus().toString(),
+                    Instant.ofEpochMilli(postReport.getDateReported().getTime()).getEpochSecond(),
+                    reporter.getId(),
+                    post.getId());
+            DatabaseController.insertRecord(sql);
+
+            ReportSystem.getInstance().getOpenReports().add(postReport);
+//        });
+
     }
 
     public Post getPostById(int postId) {
@@ -91,7 +111,9 @@ public class UserSystemController {
     public void adminRemovePost(Post post) {
         threadPool.submit(() -> {
             userSystem.getAllPosts().remove(post);
-            String sql = DatabaseController.generateDeleteStatement("posts", "id", post.getId());
+            String sql = DatabaseController.generateDeleteStatement(
+                    "posts",
+                    "id", post.getId());
             DatabaseController.deleteRecord(sql);
         });
     }
@@ -99,7 +121,9 @@ public class UserSystemController {
     public void adminBanUser(AdminAccount adminAccount, UserAccount userAccount) {
         threadPool.submit(() -> {
             userSystem.getUserAccounts().remove(userAccount);
-            String sql = DatabaseController.generateDeleteStatement("post_reports", "id", userAccount.getId());
+            String sql = DatabaseController.generateDeleteStatement(
+                    "post_reports",
+                    "id", userAccount.getId());
             DatabaseController.deleteRecord(sql);
         });
     }

@@ -98,12 +98,6 @@ public class UserInterfaceController {
     }
 
     private void loadFeed() {
-//        for (int i = 0; i < feedVBox.getChildren().size(); i++) {
-//            if (feedVBox.getChildren().get(i) instanceof VBox) {
-//                feedVBox.getChildren().remove(i);
-//                i--;
-//            }
-//        }
         feedVBox.getChildren().removeIf(node -> node instanceof VBox);
 
         UserSystem.getInstance().getAllPosts().forEach(post -> {
@@ -117,13 +111,6 @@ public class UserInterfaceController {
     }
 
     private void loadProfile() {
-//        for (int i = 0; i < profileVBox.getChildren().size(); i++) {
-//            if (profileVBox.getChildren().get(i) instanceof VBox) {
-//                profileVBox.getChildren().remove(i);
-//                i--;
-//            }
-//        }
-
         profileVBox.getChildren().removeIf(node -> node instanceof VBox);
 
         UserSystem.getInstance().getPostsByUser(UserSystem.getInstance().getCurrentUser()).forEach(post -> {
@@ -179,7 +166,7 @@ public class UserInterfaceController {
             if (!postContent.trim().isEmpty()) {
                 var currentUser = UserSystem.getInstance().getCurrentUser();
                 UserSystemController.getInstance().userPost(currentUser, postContent); // Update the backend
-                
+
                 loadFeed();
                 loadProfile();
             }
@@ -214,6 +201,7 @@ public class UserInterfaceController {
         Button likeButton = new Button("👍");
 //        likeButton.setOnAction(event -> handleLikeButton(counterLabel, postId));
         Button reportButton = new Button("⚠");
+        reportButton.setOnAction(event -> handleReportButton(post));
 
         // Add reaction elements to HBox
         reactionBox.getChildren().addAll(counterLabel, likeButton, reportButton);
@@ -224,6 +212,28 @@ public class UserInterfaceController {
         // Add the post VBox to the feed container
         feedVBox.getChildren().add(1, postBox); // Add at the top of the feed
     }
+
+    private void handleReportButton(Post post) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Report Post");
+        dialog.setHeaderText("Please provide a reason for reporting this post:");
+
+        TextArea reasonTextArea = new TextArea();
+        reasonTextArea.setWrapText(true);
+        dialog.getDialogPane().setContent(reasonTextArea);
+
+        dialog.showAndWait().ifPresent(reason -> {
+            String reportReason = reasonTextArea.getText();
+            if (!reportReason.trim().isEmpty()) {
+                UserSystemController.getInstance().reportPost(UserSystem.getInstance().getCurrentUser(), post, reportReason);
+                loadFeed();
+            }
+        });
+
+        // Refresh the feed view to reflect the changes
+        loadFeed();
+    }
+
 
     // Helper method to add a post to the profileVBox
     private void addPostToProfile(String headerText, String postContent, Post post) {
@@ -280,20 +290,6 @@ public class UserInterfaceController {
     @FXML
     void handleProfileButton() {
         userTabPane.getSelectionModel().select(2); // Switch to the profile tab
-
-        // Clear the existing content in profileVBox to avoid duplicates
-//        profileVBox.getChildren().clear();
-//        profileVBox.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;");
-//        profileVBox.setSpacing(5);
-//
-//        // Retrieve the current user's posts
-//        UserSystem.getInstance().getCurrentUser().getPosts().forEach(post -> {
-//            // Create a header with the user's name and the post date
-//            String headerText = UserSystem.getInstance().getCurrentUser().getName() + " - " + post.getDatePosted();
-//
-//            // Add the post to the profile view
-//            addPostToProfile(headerText, post.getText(), post.getId());
-//        });
     }
 
     // Method to handle removing a post
@@ -318,7 +314,7 @@ public class UserInterfaceController {
     }
 
     @FXML
-    void handleLikeButton(Label counterLabel, int postId) {
+    private void handleLikeButton(Label counterLabel, int postId) {
         Post post = UserSystemController.getInstance().getPostById(postId); // Get post from its id
         UserSystemController.getInstance().userLikePost(UserSystem.getInstance().getCurrentUser(), post); // Like the post within DB
         post = UserSystemController.getInstance().getPostById(postId); // Update the post to the version added to DB from userLikePost method

@@ -85,35 +85,31 @@ public class DatabaseController {
             """;
 
     public static final String CREATE_USER_REPORT_TABLE = """
-            CREATE TABLE IF NOT EXISTS user_reports (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reason TEXT NOT NULL,
-                status TEXT NOT NULL,
-                date INTEGER NOT NULL,
-                adminId INTEGER,
-                creationDate INTEGER NOT NULL,
-                reporterId INTEGER NOT NULL,
-                reporteeId INTEGER NOT NULL,
-                FOREIGN KEY (adminId) REFERENCES admins(id),
-                FOREIGN KEY (reporterId) REFERENCES users(id),
-                FOREIGN KEY (reporteeId) REFERENCES users(id)
-            )
+            CREATE TABLE IF NOT EXISTS "user_reports" (
+            	"id"	INTEGER,
+            	"reason"	TEXT NOT NULL,
+            	"status"	TEXT NOT NULL,
+            	"date"	INTEGER NOT NULL,
+            	"reporterId"	INTEGER NOT NULL,
+            	"reporteeId"	INTEGER NOT NULL,
+            	PRIMARY KEY("id"),
+            	FOREIGN KEY("reporteeId") REFERENCES "users"("id"),
+            	FOREIGN KEY("reporterId") REFERENCES "users"("id")
+            );
             """; //Possibly change adminId to be not null?
 
     public static final String CREATE_POST_REPORT_TABLE = """
-            CREATE TABLE IF NOT EXISTS post_reports (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reason TEXT NOT NULL,
-                status TEXT NOT NULL,
-                date INTEGER NOT NULL,
-                adminId INTEGER,
-                reporterId INTEGER NOT NULL,
-                postId INTEGER NOT NULL,
-                creationDate, INTEGER NOT NULL,
-                FOREIGN KEY (adminId) REFERENCES admins(id),
-                FOREIGN KEY (reporterId) REFERENCES users(id),
-                FOREIGN KEY (postId) REFERENCES posts(id)
-            )
+            CREATE TABLE IF NOT EXISTS "post_reports" (
+            	"id"	INTEGER,
+            	"reason"	TEXT NOT NULL,
+            	"status"	TEXT NOT NULL,
+            	"date"	INTEGER NOT NULL,
+            	"reporterId"	INTEGER NOT NULL,
+            	"postId"	INTEGER NOT NULL,
+            	PRIMARY KEY("id"),
+            	FOREIGN KEY("postId") REFERENCES "posts"("id"),
+            	FOREIGN KEY("reporterId") REFERENCES "users"("id")
+            );
             """; //Possibly change adminId to be not null?
 
     /**
@@ -608,7 +604,7 @@ public class DatabaseController {
 
                 if (reportClass == UserReport.class) {
                     int reporteeId = resultSet.getInt("reporteeId");
-                    reports.add(reportClass.cast(new UserReport(id, adminId, reporterId, status, reason, date, reporteeId)));
+                    reports.add(reportClass.cast(new UserReport(id, reporterId, status, reason, date, reporteeId)));
                 } else if (reportClass == PostReport.class) {
                     int postId = resultSet.getInt("postId");
                     reports.add(reportClass.cast(new PostReport(id, adminId, reporterId, status, reason, date, postId)));
