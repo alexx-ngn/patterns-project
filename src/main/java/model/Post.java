@@ -1,5 +1,6 @@
 package model;
 
+import controller.UserSystemController;
 import lombok.*;
 
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.Set;
 @EqualsAndHashCode
 public class Post {
     private int id;
+//    private static int nextId = UserSystemController.getInstance().getLastPostId() == 0 ? 1 : UserSystemController.getInstance().getLastPostId();
     private int userId;
     private String text;
     private int likes;
@@ -18,7 +20,7 @@ public class Post {
     private Date datePosted;
 
     public Post(int userId, String text) {
-        this.id = 0;
+//        this.id = nextId++;
         this.userId = userId;
         this.text = text;
         this.likes = 0;

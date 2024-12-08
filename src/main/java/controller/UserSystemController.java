@@ -2,7 +2,6 @@ package controller;
 
 import lombok.Getter;
 import model.Post;
-import model.ReportSystem;
 import model.UserAccount;
 import model.UserSystem;
 
@@ -82,6 +81,12 @@ public class UserSystemController {
 
     public Post getPostById(int postId) {
         String sql = DatabaseController.generateSelectStatement("posts", "id", postId);
-        return DatabaseController.selectRecord(sql).getFirst();
+        return DatabaseController.selectPostsRecord(sql).getFirst();
+    }
+
+    public int getLastPostId() {
+        String sql = "SELECT * FROM posts WHERE id = (SELECT MAX(id) FROM posts)";
+        Post post = DatabaseController.selectPostsRecord(sql).getFirst();
+        return post != null ? post.getId() : 0;
     }
 }

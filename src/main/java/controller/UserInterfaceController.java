@@ -111,7 +111,7 @@ public class UserInterfaceController {
             String username = UserSystem.getInstance().getUserById(post.getUserId());
 
             String header = username + " - " + getFormattedDateTime(postDate);
-            addPostToFeed(header, post.getText());
+            addPostToFeed(header, post.getText(), post.getId());
         });
     }
 
@@ -125,7 +125,7 @@ public class UserInterfaceController {
 
         UserSystem.getInstance().getPostsByUser(UserSystem.getInstance().getCurrentUser()).forEach(post -> {
             String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + getFormattedDateTime(post.getDatePosted());
-            addPostToProfile(header, post.getText());
+            addPostToProfile(header, post.getText(), post.getId());
         });
     }
 
@@ -176,18 +176,18 @@ public class UserInterfaceController {
             if (!postContent.trim().isEmpty()) {
                 var currentUser = UserSystem.getInstance().getCurrentUser();
                 UserSystemController.getInstance().userPost(currentUser, postContent); // Update the backend
-//                int postId = UserSystem.getInstance().getCurrentUser().getPosts().getLast().getId();
+                int postId = UserSystem.getInstance().getAllPosts().isEmpty() ? 1 : UserSystem.getInstance().getAllPosts().getLast().getId();
                 UserSystem.getInstance().getCurrentUser().post(postContent); // Update the backend
-                Date postDate = UserSystem.getInstance().getAllPosts().getLast().getDatePosted();
+                Date postDate = new Date();
 
                 String header = UserSystem.getInstance().getCurrentUser().getName() + " - " + getFormattedDateTime(postDate); // Create the header
-                addPostToFeed(header, postContent); // Add to the feed visually
-                addPostToProfile(header, postContent);
+                addPostToFeed(header, postContent, postId); // Add to the feed visually
+                addPostToProfile(header, postContent, postId);
             }
         });
     }
 
-    private void addPostToFeed(String headerText, String postContent) {
+    private void addPostToFeed(String headerText, String postContent, int postId) {
         // Create a VBox for the post
         VBox postBox = new VBox();
         postBox.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;");
@@ -227,7 +227,7 @@ public class UserInterfaceController {
     }
 
     // Helper method to add a post to the profileVBox
-    private void addPostToProfile(String headerText, String postContent) {
+    private void addPostToProfile(String headerText, String postContent, int postId) {
         // Create a VBox for the post
         VBox postBox = new VBox();
         postBox.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-padding: 10;");
@@ -256,7 +256,12 @@ public class UserInterfaceController {
         Button likeButton = new Button("👍");
 //        likeButton.setOnAction(event -> handleLikeButton(counterLabel, postId));
         Button removeButton = new Button("🗑");
-//        removeButton.setOnAction(event -> handleRemovePost(UserSystemController.getInstance().getPostById(postId)));
+        removeButton.setOnAction(event -> {
+                    handleRemovePost(UserSystemController.getInstance().getPostById(postId));
+                    postBox.getChildren().remove(postBox);
+                    loadProfile();
+                    loadFeed();
+        });
 
         // Add reaction elements to HBox
         reactionBox.getChildren().addAll(counterLabel, likeButton, removeButton);
@@ -303,7 +308,8 @@ public class UserInterfaceController {
         UserSystemController.getInstance().userRemovePost(UserSystem.getInstance().getCurrentUser(), post);
 
         // Refresh the profile view to reflect the changes
-        // handleProfileButton();
+        loadProfile();
+        loadFeed();
     }
 
     @FXML

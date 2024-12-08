@@ -3,7 +3,6 @@ package controller;
 import model.*;
 
 import java.sql.*;
-import java.text.DateFormat;
 import java.util.*;
 import java.util.Date;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -212,7 +211,7 @@ public class DatabaseController {
      * Selects a record from a table
      * @param sql the SELECT statement to execute
      */
-    public static List<Post> selectRecord(String sql) {
+    public static List<Post> selectPostsRecord(String sql) {
         if (!sql.toUpperCase().contains("SELECT")) {
             throw new IllegalArgumentException("SQL statement must be a SELECT statement");
         }

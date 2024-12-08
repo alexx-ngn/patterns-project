@@ -48,7 +48,7 @@ public class UserAccount extends Account {
      */
     public Post post(String text) {
         Post post = new Post(this.getId(), text);
-//        posts.add(post);
+        posts.add(post);
         return post;
     }
 
