@@ -87,8 +87,22 @@ public class AdminInterfaceController {
     @FXML
     private Label welcomeLabel;
 
+    /**
+     * Represents the current locale setting used in the AdminInterfaceController.
+     * The locale is utilized to manage and update the internationalization
+     * (i18n) resources such as labels, buttons, and other UI components
+     * according to the selected language and region preferences.
+     */
     private Locale locale;
 
+    /**
+     * Updates the labels and button texts within the admin interface using the current locale settings.
+     * This method retrieves the appropriate translations for label and button texts from the
+     * resource bundle for the admin interface based on the current locale.
+     * It updates the text properties of various UI elements such as welcome label, open post
+     * reports label, open reports button, logout button, and open user reports label.
+     * This ensures that the interface displays the correct language as per the user's locale setting.
+     */
     private void updateLabels() {
         locale = LanguageManager.getInstance().getCurrentLocale();
         ResourceBundle bundle = ResourceBundle.getBundle("lang.Admin", locale);
@@ -99,26 +113,55 @@ public class AdminInterfaceController {
         openUserReportslabel.setText(bundle.getString("openUserReports.label"));
     }
 
+    /**
+     * Handles the action of clicking the "Open Reports" button.
+     * This method selects the first tab in the adminTabPane,
+     * presumably to display open reports.
+     */
     @FXML
     void handleOpenReportsButton() {
         adminTabPane.getSelectionModel().select(0);
     }
 
+    /**
+     * Handles the action of pressing the "Closed Reports" button within the admin interface.
+     * This method selects the second tab in the admin tab pane, which is assumed
+     * to be associated with closed reports, allowing the user to view them.
+     */
     @FXML
     void handleClosedReportsButton() {
         adminTabPane.getSelectionModel().select(1);
     }
 
+    /**
+     * Handles the action event triggered by the search button.
+     * This method selects the third tab in the adminTabPane,
+     * indicating a transition to a different view or section within the interface.
+     */
     @FXML
     void handleSearchButton() {
         adminTabPane.getSelectionModel().select(2);
     }
 
+    /**
+     * Handles the event triggered by clicking the "Search Profile" button.
+     *
+     * This method is responsible for switching the current selection in the
+     * admin tab pane to the third tab, typically associated with profile search functionality.
+     * It ensures that the user interface updates accordingly to reflect this change.
+     */
     @FXML
     void handleSearchProfileButton() {
         adminTabPane.getSelectionModel().select(2);
     }
 
+    /**
+     * Handles the logout button action.
+     *
+     * This method is triggered when the logout button is clicked in the admin interface.
+     * It closes the current admin stage and opens a new login interface stage.
+     * If an error occurs while starting the login interface, it throws a RuntimeException.
+     */
     @FXML
     void handleLogoutButton() {
         Stage currentStage = (Stage) this.adminTabPane.getScene().getWindow();
@@ -130,6 +173,21 @@ public class AdminInterfaceController {
         }
     }
 
+    /**
+     * Initializes the admin interface controller by setting the current locale,
+     * updating UI labels, and loading user and post reports. This method is
+     * automatically invoked after the FXML file has been loaded.
+     *
+     * The method performs the following actions:
+     * 1. Retrieves the current locale from the LanguageManager and assigns it
+     *    to the instance variable for localization purposes.
+     * 2. Calls the updateLabels() method to refresh the UI labels based on
+     *    the current locale.
+     * 3. Invokes loadPostReports() to populate the post reports section,
+     *    organizing them into open and closed categories.
+     * 4. Calls loadUserReports() to set up the user reports section,
+     *    organizing the reports by their open and closed status.
+     */
     @FXML
     public void initialize() {
         locale = LanguageManager.getInstance().getCurrentLocale();
@@ -138,12 +196,24 @@ public class AdminInterfaceController {
         loadUserReports();
     }
 
+    /**
+     * The resource bundle for the "Admin" scene, retrieved based on the current locale.
+     * This bundle contains localized resources such as text for the Admin interface.
+     * These resources are used to ensure the UI can adapt to different languages and regions
+     * depending on the user's settings.
+     */
     ResourceBundle bundle = LanguageManager.getInstance().getResourceBundle("Admin");
 
     /**
-     * Loads the post reports into the respective TableViews for open and closed reports.
-     * Clears the existing items in the TableViews and repopulates them with the latest data.
-     * Adds event handlers to handle double-click events on the TableView rows.
+     * Loads post reports into the specified table views, dividing them into open and closed reports.
+     *
+     * This method clears any existing items in the open and closed post reports table views. It then
+     * sets up cell value factories for the report IDs and report dates, formatting the dates as needed.
+     * Reports are retrieved from the {@link ReportSystem} singleton and categorized into open and closed
+     * based on their status, which are then added to the respective table view.
+     *
+     * Additionally, double-click event handlers are attached to both open and closed post reports table
+     * views, allowing the user to open a detailed view of a report when double-clicked.
      */
     private void loadPostReports() {
         openPostReportsTableView.getItems().clear();
@@ -185,6 +255,14 @@ public class AdminInterfaceController {
         });
     }
 
+    /**
+     * Loads user reports into the respective table views for open and closed reports.
+     * The method clears existing items from the tables, sets up cell value factories
+     * for report ID and formatted report date, and sorts the reports based on their status.
+     * Open reports are added to the openUserReportsTableView, while closed reports
+     * are added to the closedUserReportsTableView. It also sets a double-click mouse
+     * event handler on both tables to open a selected report when double-clicked.
+     */
     private void loadUserReports() {
         openUserReportsTableView.getItems().clear();
         closedUserReportsTableView.getItems().clear();
@@ -225,6 +303,13 @@ public class AdminInterfaceController {
         });
     }
 
+    /**
+     * Opens a detailed report window for the given report. The window displays various details about the
+     * report including the report ID, reason for the report, content details (either post or user),
+     * status, and options to dismiss or delete the report if it is open.
+     *
+     * @param report the report object containing information about the post or user being reported.
+     */
     private void openReport(Report report) {
         // Create a new Stage
         Stage reportStage = new Stage();
@@ -343,6 +428,12 @@ public class AdminInterfaceController {
         reportStage.show();
     }
 
+    /**
+     * Converts a given date to a formatted string representation.
+     *
+     * @param postDate the date to be formatted
+     * @return a formatted date string in the pattern "yyyy-MM-dd HH:mm"
+     */
     private String getFormattedDateTime(Date postDate) {
         // Convert Date to LocalDateTime
         LocalDateTime localDateTime = postDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -354,6 +445,14 @@ public class AdminInterfaceController {
         return localDateTime.format(formatter);
     }
 
+    /**
+     * Opens a new window displaying the user's profile, including their username
+     * and a list of their posts. The profile window is created using a new Stage
+     * and includes a VBox layout to organize the user's post headers and content.
+     *
+     * @param user the UserAccount object representing the user whose profile
+     *             should be displayed
+     */
     private void openUserProfileWindow(UserAccount user) {
         // Create a new Stage
         Stage profileStage = new Stage();
