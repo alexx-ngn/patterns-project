@@ -90,11 +90,9 @@ public class AdminInterfaceController {
     private Locale locale;
 
     private void updateLabels() {
+        locale = LanguageManager.getInstance().getCurrentLocale();
         ResourceBundle bundle = ResourceBundle.getBundle("lang.Admin", locale);
         welcomeLabel.setText(bundle.getString("welcome.label"));
-//        closedReportsButton.setText(bundle.getString("label.welcome"));
-//        closedUserReportsLabel.setText(bundle.getString("label.welcome"));
-//        closedPostReportsLabel.setText(bundle.getString("label.welcome"));
         openPostReportsLabel.setText(bundle.getString("openPostReports.label"));
         openReportsButton.setText(bundle.getString("openReports.button"));
         logoutButton.setText(bundle.getString("logout.button"));
@@ -139,6 +137,8 @@ public class AdminInterfaceController {
         loadPostReports();
         loadUserReports();
     }
+
+    ResourceBundle bundle = LanguageManager.getInstance().getResourceBundle("Admin");
 
     /**
      * Loads the post reports into the respective TableViews for open and closed reports.
@@ -225,31 +225,22 @@ public class AdminInterfaceController {
         });
     }
 
-    private void handleReportClick(Report report) {
-        // Handle the report click event
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Report Details");
-        alert.setHeaderText("Report ID: " + report.getId());
-        alert.setContentText("Report Details: " + report.getReason());
-        alert.showAndWait();
-    }
-
     private void openReport(Report report) {
         // Create a new Stage
         Stage reportStage = new Stage();
-        reportStage.setTitle("Post Details");
+        reportStage.setTitle(bundle.getString("title.details"));
 
         // Create a VBox to hold the post details
         VBox postVBox = new VBox(10);
         postVBox.setPadding(new Insets(10));
 
         // Add a title Label
-        Label postTitle = new Label("Report ID: " + report.getId());
+        Label postTitle = new Label("ID: " + report.getId());
         postTitle.setFont(new Font("System Bold", 18));
         postVBox.getChildren().add(postTitle);
 
         // Add reason header
-        Label reasonHeader = new Label("Reason:");
+        Label reasonHeader = new Label(bundle.getString("reason.details"));
         reasonHeader.setFont(new Font("System Bold", 16));
         postVBox.getChildren().add(reasonHeader);
 
@@ -259,7 +250,7 @@ public class AdminInterfaceController {
         postVBox.getChildren().add(reportReason);
 
         // Add the header
-        Label postHeader = new Label("Content:");
+        Label postHeader = new Label(bundle.getString("content.details"));
         postHeader.setFont(new Font("System Bold", 16));
         postVBox.getChildren().add(postHeader);
 
@@ -269,7 +260,7 @@ public class AdminInterfaceController {
             try {
                 postContent = new Label(UserSystem.getInstance().getPostById(postReport.getReportedPostId()).getText());
             } catch (NullPointerException e) {
-                postContent = new Label("DELETED");
+                postContent = new Label(bundle.getString("removed.details"));
             }
             postContent.setWrapText(true);
             postVBox.getChildren().add(postContent);
@@ -282,26 +273,26 @@ public class AdminInterfaceController {
                     openUserProfileWindow(user);
                 });
             } catch (NullPointerException e) {
-                postContent = new Hyperlink("DELETED");
+                postContent = new Hyperlink(bundle.getString("removed.details"));
             }
             postVBox.getChildren().add(postContent);
         }
 
         // Add the post details
-        Label postDetails = new Label("Details:");
+        Label postDetails = new Label(bundle.getString("title.details"));
         postDetails.setFont(new Font("System Bold", 16));
         postVBox.getChildren().add(postDetails);
 
         // Add the post date
-        Label postDate = new Label("Reported on: " + getFormattedDateTime(report.getDateReported()));
+        Label postDate = new Label(bundle.getString("reportedDate.details") + getFormattedDateTime(report.getDateReported()));
         postVBox.getChildren().add(postDate);
 
         // Add the post reporter
-        Label postReporter = new Label("Reported by: " + UserSystem.getInstance().getUserById(report.getReportingUserId()).getUsername());
+        Label postReporter = new Label(bundle.getString("reportedBy.details") + UserSystem.getInstance().getUserById(report.getReportingUserId()).getUsername());
         postVBox.getChildren().add(postReporter);
 
         // Add the post status
-        Label postStatus = new Label("Status: " + report.getStatus().toString());
+        Label postStatus = new Label(bundle.getString("status.details") + report.getStatus().toString());
         postVBox.getChildren().add(postStatus);
 
         // Add Hbox for buttons
@@ -310,7 +301,7 @@ public class AdminInterfaceController {
 
         if (report.getStatus().equals(Report.Status.OPENED)) {
             // Add the dismiss button
-            Button dismissButton = new Button("Dismiss");
+            Button dismissButton = new Button(bundle.getString("dismiss.details"));
             dismissButton.setOnAction(event -> {
                 report.setStatus(Report.Status.CLOSED);
                 report.setDateReported(new Date());
@@ -326,7 +317,7 @@ public class AdminInterfaceController {
             buttonHBox.getChildren().add(dismissButton);
 
             // Add the delete button
-            Button deleteButton = new Button("Delete");
+            Button deleteButton = new Button(bundle.getString("remove.details"));
             deleteButton.setOnAction(event -> {
                 if (report instanceof PostReport postReport) {
                     ReportSystemController.getInstance().deletePost(postReport.getReportedPostId());
@@ -366,14 +357,14 @@ public class AdminInterfaceController {
     private void openUserProfileWindow(UserAccount user) {
         // Create a new Stage
         Stage profileStage = new Stage();
-        profileStage.setTitle(user.getUsername() + "'s Profile");
+        profileStage.setTitle(user.getUsername());
 
         // Create a VBox to hold the user's posts
         VBox profileVBox = new VBox(10);
         profileVBox.setPadding(new Insets(10));
 
         // Add a title Label
-        Label profileTitle = new Label("Posts by " + user.getUsername());
+        Label profileTitle = new Label(bundle.getString("postsBy.profile") + user.getUsername());
         profileTitle.setFont(new Font("System Bold", 18));
 
         profileVBox.getChildren().add(profileTitle);
