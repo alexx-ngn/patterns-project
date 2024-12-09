@@ -611,8 +611,7 @@ public class DatabaseController {
                 String reason = resultSet.getString("reason");
                 String stringStatus = resultSet.getString("status");
                 Report.Status status = Report.Status.valueOf(stringStatus);
-                Date date = resultSet.getDate("date");
-                int adminId = resultSet.getInt("adminId");
+                Date date = new Date(resultSet.getLong("date") * 1000L);
                 int reporterId = resultSet.getInt("reporterId");
 
                 if (reportClass == UserReport.class) {
@@ -620,7 +619,7 @@ public class DatabaseController {
                     reports.add(reportClass.cast(new UserReport(id, reporterId, status, reason, date, reporteeId)));
                 } else if (reportClass == PostReport.class) {
                     int postId = resultSet.getInt("postId");
-                    reports.add(reportClass.cast(new PostReport(id, adminId, reporterId, status, reason, date, postId)));
+                    reports.add(reportClass.cast(new PostReport(id, reporterId, status, reason, date, postId)));
                 }
             }
         } catch (SQLException e) {

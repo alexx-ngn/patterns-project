@@ -70,4 +70,13 @@ public class UserSystem {
         }
         return null;
     }
+
+    public Post getPostById(int postId) {
+        for (Post post : allPosts) {
+            if (post.getId() == postId) {
+                return post;
+            }
+        }
+        return null;
+    }
 }

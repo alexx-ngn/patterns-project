@@ -12,8 +12,8 @@ import java.util.Queue;
 @Setter
 public class ReportSystem {
     private List<AdminAccount> adminAccounts;
-    private Queue<Report> openReports;
-    private List<Report> closedReports;
+    private List<UserReport> userReports;
+    private List<PostReport> postReports;
 
     @Getter
     private AdminAccount currentAdmin = null;
@@ -22,8 +22,8 @@ public class ReportSystem {
 
     private ReportSystem() {
         this.adminAccounts = DatabaseController.selectAllAdmins();
-        this.openReports = new LinkedList<>();
-        this.closedReports = new LinkedList<>();
+        this.userReports = DatabaseController.selectAllUserReports();
+        this.postReports = DatabaseController.selectAllPostReports();
     }
 
     public static ReportSystem getInstance() {

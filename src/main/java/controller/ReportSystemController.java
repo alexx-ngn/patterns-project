@@ -46,7 +46,7 @@ public class ReportSystemController {
 
     public void submitUserReport(UserReport userReport) {
         threadPool.submit(() -> {
-            reportSystem.getOpenReports().add(userReport);
+            reportSystem.getUserReports().add(userReport);
             String sql = DatabaseController.generateInsertStatement("user_reports", userReport.getReason(), userReport.getStatus().name(),
                     userReport.getDateReported(), userReport.getReportingUserId(), userReport.getReportedUserId());
             DatabaseController.insertRecord(sql);
@@ -55,7 +55,7 @@ public class ReportSystemController {
 
     public void submitPostReport(PostReport postReport) {
         threadPool.submit(() -> {
-            reportSystem.getOpenReports().add(postReport);
+            reportSystem.getPostReports().add(postReport);
             String sql = DatabaseController.generateInsertStatement("post_reports", postReport.getReason(), postReport.getStatus().name(),
                     postReport.getDateReported(), postReport.getReportingUserId(), postReport.getReportedPostId());
             DatabaseController.insertRecord(sql);
@@ -65,7 +65,7 @@ public class ReportSystemController {
     public void adminRemoveUserReport(AdminAccount adminAccount, UserReport userReport) {
         threadPool.submit(() -> {
             adminAccount.removeReport(userReport);
-            reportSystem.getOpenReports().remove(userReport);
+            reportSystem.getUserReports().remove(userReport);
             String sql = DatabaseController.generateDeleteStatement("user_reports", "id", userReport.getId());
             DatabaseController.deleteRecord(sql);
         });
@@ -74,7 +74,7 @@ public class ReportSystemController {
     public void adminRemovePostReport(AdminAccount adminAccount, PostReport postReport) {
         threadPool.submit(() -> {
             adminAccount.removeReport(postReport);
-            reportSystem.getOpenReports().remove(postReport);
+            reportSystem.getPostReports().remove(postReport);
             String sql = DatabaseController.generateDeleteStatement("users", "id", postReport.getId());
             DatabaseController.deleteRecord(sql);
         });
@@ -120,11 +120,19 @@ public class ReportSystemController {
         });
     }
 
-    public void adminClosePostReport(AdminAccount adminAccount, PostReport postReport) {
-        threadPool.submit(() -> {
-            adminAccount.closeReport(postReport);
+    public void closePostReport(PostReport postReport) {
+//        threadPool.submit(() -> {
+//            adminAccount.closeReport(postReport);
             String sql = DatabaseController.generateUpdateStatement("post_reports", "status", Report.Status.CLOSED.name(), "id", postReport.getId());
+        System.out.println(sql);
             DatabaseController.updateRecord(sql);
-        });
+//        });
+    }
+
+    public void deletePost(int reportedPostId) {
+        Post post = UserSystem.getInstance().getPostById(reportedPostId);
+        UserSystem.getInstance().getAllPosts().remove(post);
+        String sql = DatabaseController.generateDeleteStatement("posts", "id", reportedPostId);
+        DatabaseController.deleteRecord(sql);
     }
 }
