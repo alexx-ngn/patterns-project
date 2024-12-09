@@ -2,7 +2,6 @@ package model;
 
 import lombok.*;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +34,6 @@ public class UserAccount extends Account {
      *
      * @param post the post to be removed from the user's list of posts
      */
-    @Override
     public void removePost(Post post) {
         posts.remove(post);
     }

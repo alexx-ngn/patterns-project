@@ -10,7 +10,6 @@ import java.util.concurrent.Executors;
 @Getter
 public class UserSystemController {
     private UserSystem userSystem;
-    private static ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
     /**
      * The singleton instance of the UserSystemController class.
@@ -59,12 +58,10 @@ public class UserSystemController {
      * @param userAccount the UserAccount object representing the user to be added
      */
     public void addUser(UserAccount userAccount) {
-        // threadPool.submit(() -> {
-            userSystem.getUserAccounts().add(userAccount);
-            String sql = DatabaseController.generateInsertStatement("users", userAccount.getName(),
-                    userAccount.getEmail(), userAccount.getUsername(), userAccount.getPassword(), userAccount.getFollowerCount());
-            DatabaseController.insertRecord(sql);
-        // });
+        userSystem.getUserAccounts().add(userAccount);
+        String sql = DatabaseController.generateInsertStatement("users", userAccount.getName(),
+                userAccount.getEmail(), userAccount.getUsername(), userAccount.getPassword(), userAccount.getFollowerCount());
+        DatabaseController.insertRecord(sql);
     }
 
     /**
@@ -94,14 +91,11 @@ public class UserSystemController {
      * @param post The post to be removed from the user's account and the system.
      */
     public void userRemovePost(UserAccount userAccount, Post post) {
-        // threadPool.submit(() -> {
-            String sql = DatabaseController.generateDeleteStatement("posts", "id", post.getId());
-            DatabaseController.deleteRecord(sql);
+        String sql = DatabaseController.generateDeleteStatement("posts", "id", post.getId());
+        DatabaseController.deleteRecord(sql);
 
-            userSystem.getAllPosts().remove(post);
-            userAccount.removePost(post);
-
-        // });
+        userSystem.getAllPosts().remove(post);
+        userAccount.removePost(post);
     }
 
     /**
@@ -113,7 +107,6 @@ public class UserSystemController {
      * @param followed the UserAccount who is being followed
      */
     public void userFollowUser(UserAccount follower, UserAccount followed) {
-        // threadPool.submit(() -> {
         String sql = DatabaseController.generateFullInsertStatement("follows", follower.getId(), followed.getId());
         DatabaseController.insertRecord(sql);
 
@@ -122,7 +115,6 @@ public class UserSystemController {
 
         String updateSql = DatabaseController.generateUpdateStatement("users", "numFollowers", followed.getFollowerids().size(), "id", followed.getId());
         DatabaseController.updateRecord(updateSql);
-        // });
     }
 
     /**
@@ -133,7 +125,6 @@ public class UserSystemController {
      * @param unfollowed The UserAccount instance representing the user who is being unfollowed.
      */
     public void userUnfollowUser(UserAccount unfollower, UserAccount unfollowed) {
-        // threadPool.submit(() -> {
         String sql = DatabaseController.generateDeleteStatement("follows", "followerId", unfollower.getId(), "followeeId", unfollowed.getId());
         DatabaseController.deleteRecord(sql);
 
@@ -142,7 +133,6 @@ public class UserSystemController {
 
         String updateSql = DatabaseController.generateUpdateStatement("users", "numFollowers", unfollowed.getFollowerids().size(), "id", unfollowed.getId());
         DatabaseController.updateRecord(updateSql);
-        // });
     }
 
     /**
@@ -154,7 +144,6 @@ public class UserSystemController {
      * @param post the Post object representing the post being liked
      */
     public void userLikePost(int userId, Post post) {
-        // threadPool.submit(() -> {
         // Insert likes record
         String insertSql = DatabaseController.generateFullInsertStatement("likes", userId, post.getId());
         DatabaseController.insertRecord(insertSql);
@@ -166,7 +155,6 @@ public class UserSystemController {
         // Update numLikes column of post record
         String updateSql = DatabaseController.generateUpdateStatement("posts", "numLikes", post.getLikedByUserIds().size(), "id", post.getId());
         DatabaseController.updateRecord(updateSql);
-        // });
     }
 
     /**
@@ -179,7 +167,6 @@ public class UserSystemController {
      * @param post the post that is being unliked
      */
     public void userUnlikePost(UserAccount userAccount, Post post) {
-        // threadPool.submit(() -> {
         // Remove likes record
         String sql = DatabaseController.generateDeleteStatement("likes", "userId", userAccount.getId(), "postId", post.getId());
         DatabaseController.deleteRecord(sql);
@@ -191,7 +178,6 @@ public class UserSystemController {
         // Update numLikes column of post record
         String updateSql = DatabaseController.generateUpdateStatement("posts", "numLikes", post.getLikedByUserIds().size(), "id", post.getId());
         DatabaseController.updateRecord(updateSql);
-        // });
     }
 
     /**
@@ -204,20 +190,17 @@ public class UserSystemController {
      * @param reason The reason provided by the reporter for reporting the post.
      */
     public void reportPost(UserAccount reporter, Post post, String reason) {
-//        threadPool.submit(() -> {
-            PostReport postReport = reporter.reportPost(post, reason);
-            String sql = DatabaseController.generateInsertStatement(
-                    "post_reports",
-                    reason,
-                    postReport.getStatus().toString(),
-                    Instant.ofEpochMilli(postReport.getDateReported().getTime()).getEpochSecond(),
-                    reporter.getId(),
-                    post.getId());
-            DatabaseController.insertRecord(sql);
+        PostReport postReport = reporter.reportPost(post, reason);
+        String sql = DatabaseController.generateInsertStatement(
+                "post_reports",
+                reason,
+                postReport.getStatus().toString(),
+                Instant.ofEpochMilli(postReport.getDateReported().getTime()).getEpochSecond(),
+                reporter.getId(),
+                post.getId());
+        DatabaseController.insertRecord(sql);
 
-            ReportSystem.getInstance().getPostReports().add(postReport);
-//        });
-
+        ReportSystem.getInstance().getPostReports().add(postReport);
     }
 
     /**
@@ -243,17 +226,6 @@ public class UserSystemController {
     }
 
     /**
-     * Retrieves a post with a specific ID from the database.
-     *
-     * @param postId the unique identifier of the post to retrieve
-     * @return the Post object corresponding to the specified ID, or null if no such post exists
-     */
-    public Post getPostById(int postId) {
-        String sql = DatabaseController.generateSelectStatement("posts", "id", postId);
-        return DatabaseController.selectPostRecord(sql).getFirst();
-    }
-
-    /**
      * Retrieves a UserAccount object based on the provided username.
      *
      * @param username the username of the user whose account information is to be retrieved
@@ -262,51 +234,5 @@ public class UserSystemController {
     public UserAccount getUserByUsername(String username) {
         String sql = DatabaseController.generateSelectStatement("users", "username", username);
         return DatabaseController.selectUserRecord(sql).getFirst();
-    }
-
-    /**
-     * Removes the specified post from the system both in memory and in the database.
-     * This operation is asynchronous and will be handled by a thread pool.
-     *
-     * @param post The post to be removed by an administrator.
-     */
-    public void adminRemovePost(Post post) {
-        threadPool.submit(() -> {
-            userSystem.getAllPosts().remove(post);
-            String sql = DatabaseController.generateDeleteStatement(
-                    "posts",
-                    "id", post.getId());
-            DatabaseController.deleteRecord(sql);
-        });
-    }
-
-    /**
-     * Bans a user account by removing it from the user system and deleting any associated post reports
-     * from the database. The banning action is performed by an admin account.
-     *
-     * @param adminAccount The admin account performing the ban action.
-     * @param userAccount The user account to be banned and removed from the system.
-     */
-    public void adminBanUser(AdminAccount adminAccount, UserAccount userAccount) {
-        threadPool.submit(() -> {
-            userSystem.getUserAccounts().remove(userAccount);
-            String sql = DatabaseController.generateDeleteStatement(
-                    "post_reports",
-                    "id", userAccount.getId());
-            DatabaseController.deleteRecord(sql);
-        });
-    }
-
-    /**
-     * Retrieves the last post ID from the database.
-     *
-     * @return the ID of the most recently added post, or 1 if no posts exist.
-     */
-    public int getLastPostId() {
-        threadPool.submit(() -> {
-            String sql = "SELECT id FROM posts ORDER BY id DESC LIMIT 1";
-            return DatabaseController.selectPostRecord(sql).getFirst().getId();
-        });
-        return 1;
     }
 }
