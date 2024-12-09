@@ -40,6 +40,18 @@ public class UserSystemController {
         // });
     }
 
+    public void userPost(UserAccount userAccount, String text) {
+        // threadPool.submit(() -> {
+        Post post = userAccount.post(text);
+        String sql = DatabaseController.generateInsertStatement("posts", post.getUserId(), post.getText(),
+                post.getLikedByUserIds().size(), Instant.now().getEpochSecond());
+        DatabaseController.insertRecord(sql);
+
+        userSystem.getAllPosts().add(post);
+        userAccount.getPosts().add(post);
+        // });
+    }
+
     public void userRemovePost(UserAccount userAccount, Post post) {
         // threadPool.submit(() -> {
             String sql = DatabaseController.generateDeleteStatement("posts", "id", post.getId());
@@ -52,31 +64,36 @@ public class UserSystemController {
     }
 
     public void userFollowUser(UserAccount follower, UserAccount followed) {
-        threadPool.submit(() -> {
-            follower.follow(followed);
-            String sql = DatabaseController.generateFullInsertStatement("follows", follower.getId(), followed.getId());
-            DatabaseController.insertRecord(sql);
-        });
+        // threadPool.submit(() -> {
+        String sql = DatabaseController.generateFullInsertStatement("follows", follower.getId(), followed.getId());
+        DatabaseController.insertRecord(sql);
+
+        followed.setFollowerids(DatabaseController.selectAllUserFollowsFromUser(followed));
+        followed.followUnfollow();
+
+        String updateSql = DatabaseController.generateUpdateStatement("users", "numFollowers", followed.getFollowerids().size(), "id", followed.getId());
+        DatabaseController.updateRecord(updateSql);
+        // });
     }
 
-    public void userPost(UserAccount userAccount, String text) {
+    public void userUnfollowUser(UserAccount unfollower, UserAccount unfollowed) {
         // threadPool.submit(() -> {
-            Post post = userAccount.post(text);
-            String sql = DatabaseController.generateInsertStatement("posts", post.getUserId(), post.getText(),
-                post.getLikedByUserIds().size(), Instant.now().getEpochSecond());
-            DatabaseController.insertRecord(sql);
+        String sql = DatabaseController.generateDeleteStatement("follows", "followerId", unfollower.getId(), "followeeId", unfollowed.getId());
+        DatabaseController.deleteRecord(sql);
 
-            userSystem.getAllPosts().add(post);
-            userAccount.getPosts().add(post);
+        unfollowed.setFollowerids(DatabaseController.selectAllUserFollowsFromUser(unfollowed));
+        unfollowed.followUnfollow();
+
+        String updateSql = DatabaseController.generateUpdateStatement("users", "numFollowers", unfollowed.getFollowerids().size(), "id", unfollowed.getId());
+        DatabaseController.updateRecord(updateSql);
         // });
     }
 
     public void userLikePost(int userId, Post post) {
-        // threadPool.submit(() -> { TODO: Prevention of user only liking post once only works without threadPool.submit()
+        // threadPool.submit(() -> {
         // Insert likes record
         String insertSql = DatabaseController.generateFullInsertStatement("likes", userId, post.getId());
         DatabaseController.insertRecord(insertSql);
-        System.out.println(insertSql);
 
         // Update properties of the post
         post.setLikedByUserIds(DatabaseController.selectAllUserLikesFromPost(post));
@@ -92,7 +109,6 @@ public class UserSystemController {
         // threadPool.submit(() -> {
         // Remove likes record
         String sql = DatabaseController.generateDeleteStatement("likes", "userId", userAccount.getId(), "postId", post.getId());
-        System.out.println(sql);
         DatabaseController.deleteRecord(sql);
 
         // Update properties of the post

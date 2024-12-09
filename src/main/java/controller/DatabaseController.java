@@ -704,6 +704,32 @@ public class DatabaseController {
     }
 
     /**
+     * Selects all user IDs who follow the given userAccount.
+     * @param userAccount the user account to select followers for
+     * @return a set of user IDs who follow the given userAccount
+     */
+    public static Set<Integer> selectAllUserFollowsFromUser(UserAccount userAccount) {
+        READ_LOCK.lock();
+        String sql = "SELECT * FROM follows WHERE followeeId = " + userAccount.getId();
+
+        Set<Integer> followerIds = new HashSet<>();
+        try (Connection connection = connect(DB_PATH);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql))
+        {
+            while (resultSet.next()) {
+                int followerId = resultSet.getInt("followerId");
+                followerIds.add(followerId);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            READ_LOCK.unlock();
+        }
+        return followerIds;
+    }
+
+    /**
      * Selects a post record from a table
      * @param sql the SELECT statement to execute
      */

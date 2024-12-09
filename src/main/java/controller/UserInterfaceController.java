@@ -7,10 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.application.Platform;
@@ -360,11 +357,34 @@ public class UserInterfaceController {
         VBox profileVBox = new VBox(10);
         profileVBox.setPadding(new Insets(10));
 
-        // Add a title Label
-        Label profileTitle = new Label("Posts by " + user.getUsername());
-        profileTitle.setFont(new Font("System Bold", 18));
+        // Username and Follow Button
+        HBox headerLayout = new HBox(10);
+        headerLayout.setAlignment(Pos.CENTER_LEFT);
 
-        profileVBox.getChildren().add(profileTitle);
+        // Create a spacer Region to push elements to the right
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        // Username label
+        Label usernameLabel = new Label(user.getUsername());
+        usernameLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        // Follower count label
+        Label followersLabel = new Label("Followers: " + user.getFollowerCount());
+        followersLabel.setStyle("-fx-font-size: 16px;");
+
+        // Follow button
+        Button followButton = new Button(followOrUnfollow(user));
+        followButton.setPrefWidth(80);
+        followButton.setOnAction(e -> handleFollowButton(followersLabel, followButton, user));
+
+        headerLayout.getChildren().addAll(usernameLabel, followButton, spacer, followersLabel);
+
+        // Add a title Label
+        Label postTitle = new Label("Posts: ");
+        postTitle.setFont(new Font("System Bold", 18));
+
+        profileVBox.getChildren().addAll(headerLayout, postTitle);
 
         // Fetch the user's posts and add them to the VBox
         UserSystem.getInstance().getPostsByUser(user).forEach(post -> {
@@ -445,7 +465,29 @@ public class UserInterfaceController {
         }
 
         // Refresh to load changes
-        Platform.runLater(() -> counterLabel.setText("" + post.getLikedByUserIds().size()));
+        Platform.runLater(() -> counterLabel.setText("" + post.getLikes()));
         loadFeed();
+    }
+
+    @FXML
+    private void handleFollowButton(Label followersLabel, Button followButton, UserAccount followed) {
+        if (!followed.getFollowerids().contains(UserSystem.getInstance().getCurrentUser().getId())) {
+            UserSystemController.getInstance().userFollowUser(UserSystem.getInstance().getCurrentUser(), followed);
+        } else if (followed.getFollowerids().contains(UserSystem.getInstance().getCurrentUser().getId())) {
+            UserSystemController.getInstance().userUnfollowUser(UserSystem.getInstance().getCurrentUser(), followed);
+        }
+        Platform.runLater(() -> {
+            followersLabel.setText("Followers:" + followed.getFollowerCount());
+            followButton.setText(followOrUnfollow(followed));
+        });
+    }
+
+    private String followOrUnfollow(UserAccount user) {
+        if (user.getFollowerids().contains(UserSystem.getInstance().getCurrentUser().getId())) {
+            return "Unfollow";
+        } else if (!user.getFollowerids().contains(UserSystem.getInstance().getCurrentUser().getId())) {
+            return "Follow";
+        }
+        return null;
     }
 }

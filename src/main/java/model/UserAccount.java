@@ -4,12 +4,14 @@ import lombok.*;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
 public class UserAccount extends Account {
-    private List<UserAccount> followers;
+    private Set<Integer> followerids;
     private int followerCount;
     private List<Post> posts;
 
@@ -18,13 +20,13 @@ public class UserAccount extends Account {
     public UserAccount(int id, String name, String email, String username, String password, int followerCount) {
         super(id, name, email, username, password);
         this.followerCount = followerCount;
-        this.followers = new ArrayList<>();
+        this.followerids = new HashSet<>();
         this.posts = new ArrayList<>();
     }
 
     public UserAccount(String name, String email, String username, String password) {
         super(name, email, username, password);
-        this.followers = new ArrayList<>();
+        this.followerids = new HashSet<>();
         this.posts = new ArrayList<>();
     }
 
@@ -33,13 +35,8 @@ public class UserAccount extends Account {
         posts.remove(post);
     }
 
-    /**
-     * follows another account and updates its followercount
-     * @param account account to be followed
-     */
-    public void follow(UserAccount account) {
-        account.getFollowers().add(this);
-        account.setFollowerCount(account.getFollowers().size()); // Update follower count of followed account
+    public void followUnfollow() {
+        followerCount = followerids.size();
     }
 
     /**
