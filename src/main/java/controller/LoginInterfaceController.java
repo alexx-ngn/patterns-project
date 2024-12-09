@@ -87,9 +87,10 @@ public class LoginInterfaceController {
             }
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Login Failed");
-            alert.setHeaderText("Incorrect Information");
-            alert.setContentText("Please fill out form again or register.");
+            ResourceBundle bundle = LanguageManager.getInstance().getResourceBundle("Login");
+            alert.setTitle(bundle.getString("alert.title"));
+            alert.setHeaderText(bundle.getString("alert.header"));
+            alert.setContentText(bundle.getString("alert.content"));
             alert.showAndWait();
         }
     }

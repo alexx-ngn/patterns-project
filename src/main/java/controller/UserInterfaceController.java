@@ -167,8 +167,9 @@ public class UserInterfaceController {
     @FXML
     void handlePostButton() {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Post");
-        dialog.setHeaderText("What's on your mind?");
+        ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
+        dialog.setTitle(bundle.getString("post.title"));
+        dialog.setHeaderText(bundle.getString("post.header"));
 
         // Replace the default input field with a TextArea
         TextArea textArea = new TextArea();
@@ -233,8 +234,9 @@ public class UserInterfaceController {
 
     private void handleReportButton(Post post) {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Report Post");
-        dialog.setHeaderText("Please provide a reason for reporting this post:");
+        ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
+        dialog.setTitle(bundle.getString("postReport.title"));
+        dialog.setHeaderText(bundle.getString("postReport.header"));
 
         TextArea reasonTextArea = new TextArea();
         reasonTextArea.setWrapText(true);
@@ -254,9 +256,9 @@ public class UserInterfaceController {
 
     private void handleReportButton(UserAccount user) {
         TextInputDialog dialog = new TextInputDialog();
-        //TODO SET LOCALIZATION
-        dialog.setTitle("Report User");
-        dialog.setHeaderText("Please provide a reason for reporting this user:");
+        ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
+        dialog.setTitle(bundle.getString("userReport.title"));
+        dialog.setHeaderText(bundle.getString("userReport.header"));
 
         TextArea reasonTextArea = new TextArea();
         reasonTextArea.setWrapText(true);

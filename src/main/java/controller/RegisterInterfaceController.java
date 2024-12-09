@@ -67,13 +67,14 @@ public class RegisterInterfaceController {
         String email = emailTextField.getText();
         String username = usernameTextField.getText();
         String password = passwordField.getText();
+        ResourceBundle bundle = LanguageManager.getInstance().getResourceBundle("Register");
 
         if (username.isEmpty() || email.isEmpty() || password.isEmpty() || accountType == null) {
             // Show an alert if any field is empty
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Registration Error");
-            alert.setHeaderText("Missing Information");
-            alert.setContentText("Please fill out all fields to register.");
+            alert.setTitle(bundle.getString("alertError.title"));
+            alert.setHeaderText(bundle.getString("alertError.header"));
+            alert.setContentText(bundle.getString("alertError.content"));
             alert.showAndWait();
         } else {
             // Call the AccountFactory and User/Report-SystemController singleton to handle registration
@@ -88,9 +89,9 @@ public class RegisterInterfaceController {
 
             // Show a success popup
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Registration Confirmed");
+            alert.setTitle(bundle.getString("alertSuccess.title"));
             alert.setHeaderText(null);
-            alert.setContentText("You have successfully registered!");
+            alert.setContentText(bundle.getString("alertSuccess.content"));
             alert.showAndWait(); // Wait for user to click "OK"
 
             // Close the current window and load the login scene
@@ -129,7 +130,7 @@ public class RegisterInterfaceController {
     }
 
     private void updateLabels() {
-        ResourceBundle bundle = ResourceBundle.getBundle("lang.Register", locale);
+        ResourceBundle bundle = LanguageManager.getInstance().getResourceBundle("Register");
         nameLabel.setText(bundle.getString("name.label"));
         usernameLabel.setText(bundle.getString("username.label"));
         emailLabel.setText(bundle.getString("email.label"));
