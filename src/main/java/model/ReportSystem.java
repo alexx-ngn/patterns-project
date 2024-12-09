@@ -48,4 +48,14 @@ public class ReportSystem {
         }
         return success;
     }
+
+    public boolean adminAccountExists(String username) {
+        boolean exists = false;
+        for (AdminAccount admin : adminAccounts) {
+            if (admin.getUsername().equals(username)) {
+                exists = true;
+            }
+        }
+        return exists;
+    }
 }

@@ -5,10 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import model.Account;
-import model.AccountFactory;
-import model.AdminAccount;
-import model.UserAccount;
+import model.*;
 import view.LoginInterface;
 
 import java.util.Locale;
@@ -75,6 +72,12 @@ public class RegisterInterfaceController {
             alert.setTitle(bundle.getString("alertError.title"));
             alert.setHeaderText(bundle.getString("alertError.header"));
             alert.setContentText(bundle.getString("alertError.content"));
+            alert.showAndWait();
+        } else if (ReportSystem.getInstance().adminAccountExists(username) || UserSystem.getInstance().userAccountExists(username)) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(bundle.getString("alertError.title"));
+            alert.setHeaderText(bundle.getString("alertError.existsHeader"));
+            alert.setContentText(bundle.getString("alertError.existsContent"));
             alert.showAndWait();
         } else {
             // Call the AccountFactory and User/Report-SystemController singleton to handle registration
