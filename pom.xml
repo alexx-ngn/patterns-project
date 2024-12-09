@@ -82,6 +82,14 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+                <includes>
+                    <!-- Include all FXML files -->
+                    <include>fxml/**/*.fxml</include>
+                    <!-- Include all properties files -->
+                    <include>lang/**/*.properties</include>
+                    <!-- Include the database file -->
+                    <include>database.db</include>
+                </includes>
             </resource>
         </resources>
     </build>
