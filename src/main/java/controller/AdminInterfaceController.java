@@ -85,21 +85,6 @@ public class AdminInterfaceController {
     private Label openUserReportslabel;
 
     @FXML
-    private Button searchButton;
-
-    @FXML
-    private Label searchLabel;
-
-    @FXML
-    private ListView<?> searchListView;
-
-    @FXML
-    private Button searchProfileButton;
-
-    @FXML
-    private TextField searchTextField;
-
-    @FXML
     private Label welcomeLabel;
 
     private Locale locale;
@@ -107,9 +92,6 @@ public class AdminInterfaceController {
     private void updateLabels() {
         ResourceBundle bundle = ResourceBundle.getBundle("lang.Admin", locale);
         welcomeLabel.setText(bundle.getString("welcome.label"));
-        searchProfileButton.setText(bundle.getString("search.tab"));
-        searchLabel.setText(bundle.getString("search.button"));
-        searchButton.setText(bundle.getString("search.button"));
 //        closedReportsButton.setText(bundle.getString("label.welcome"));
 //        closedUserReportsLabel.setText(bundle.getString("label.welcome"));
 //        closedPostReportsLabel.setText(bundle.getString("label.welcome"));
@@ -158,9 +140,14 @@ public class AdminInterfaceController {
         loadUserReports();
     }
 
+    /**
+     * Loads the post reports into the respective TableViews for open and closed reports.
+     * Clears the existing items in the TableViews and repopulates them with the latest data.
+     * Adds event handlers to handle double-click events on the TableView rows.
+     */
     private void loadPostReports() {
         openPostReportsTableView.getItems().clear();
-        openPostReportsTableView.getItems().clear();
+        closedPostReportsTableView.getItems().clear();
 
         openPostReportsId.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getId()).asObject());
         openPostReportsDate.setCellValueFactory(
@@ -183,17 +170,56 @@ public class AdminInterfaceController {
             if (event.getClickCount() == 2) { // Double-click event
                 PostReport selectedReport = openPostReportsTableView.getSelectionModel().getSelectedItem();
                 if (selectedReport != null) {
-                    openPostReport(selectedReport);
+                    openReport(selectedReport);
                 }
             }
         });
+
+        closedPostReportsTableView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) { // Double-click event
+                PostReport selectedReport = closedPostReportsTableView.getSelectionModel().getSelectedItem();
+                if (selectedReport != null) {
+                    openReport(selectedReport);
+                }
+            }
+        });
+    }
+
+    private void loadUserReports() {
+        openUserReportsTableView.getItems().clear();
+        closedUserReportsTableView.getItems().clear();
+
+        openUserReportsId.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getId()).asObject());
+        openUserReportsDate.setCellValueFactory(
+                cellData -> new SimpleStringProperty(getFormattedDateTime(cellData.getValue().getDateReported())));
+        closedUserReportsId.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getId()).asObject());
+        closedUserReportsDate.setCellValueFactory(
+                cellData -> new SimpleStringProperty(getFormattedDateTime(cellData.getValue().getDateReported())));
+
+        // Load open reports
+        for (UserReport report : ReportSystem.getInstance().getUserReports()) {
+            if (report.getStatus() == Report.Status.OPENED) {
+                openUserReportsTableView.getItems().add(report);
+            } else {
+                closedUserReportsTableView.getItems().add(report);
+            }
+        }
 
         // Add event handler for openUserReportsTableView
         openUserReportsTableView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) { // Double-click event
                 UserReport selectedReport = openUserReportsTableView.getSelectionModel().getSelectedItem();
                 if (selectedReport != null) {
-                    handleReportClick(selectedReport);
+                    openReport(selectedReport);
+                }
+            }
+        });
+
+        closedUserReportsTableView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) { // Double-click event
+                UserReport selectedReport = closedUserReportsTableView.getSelectionModel().getSelectedItem();
+                if (selectedReport != null) {
+                    openReport(selectedReport);
                 }
             }
         });
@@ -208,7 +234,7 @@ public class AdminInterfaceController {
         alert.showAndWait();
     }
 
-    private void openPostReport(PostReport report) {
+    private void openReport(Report report) {
         // Create a new Stage
         Stage reportStage = new Stage();
         reportStage.setTitle("Post Details");
@@ -232,18 +258,37 @@ public class AdminInterfaceController {
         reportReason.setWrapText(true);
         postVBox.getChildren().add(reportReason);
 
-        // Add the post header
-        Label postHeader = new Label("Post Content:");
+        // Add the header
+        Label postHeader = new Label("Content:");
         postHeader.setFont(new Font("System Bold", 16));
         postVBox.getChildren().add(postHeader);
 
-        // Add the post content
-        Label postContent = new Label(UserSystem.getInstance().getPostById(report.getReportedPostId()).getText());
-        postContent.setWrapText(true);
-        postVBox.getChildren().add(postContent);
+        // Add the content
+        if (report instanceof PostReport postReport) {
+            Label postContent;
+            try {
+                postContent = new Label(UserSystem.getInstance().getPostById(postReport.getReportedPostId()).getText());
+            } catch (NullPointerException e) {
+                postContent = new Label("DELETED");
+            }
+            postContent.setWrapText(true);
+            postVBox.getChildren().add(postContent);
+        } else if (report instanceof UserReport userReport) {
+            Hyperlink postContent;
+            try {
+                var user = UserSystem.getInstance().getUserById(userReport.getReportedUserId());
+                postContent = new Hyperlink(user.getUsername());
+                postContent.setOnAction(event -> {
+                    openUserProfileWindow(user);
+                });
+            } catch (NullPointerException e) {
+                postContent = new Hyperlink("DELETED");
+            }
+            postVBox.getChildren().add(postContent);
+        }
 
         // Add the post details
-        Label postDetails = new Label("Post Details:");
+        Label postDetails = new Label("Details:");
         postDetails.setFont(new Font("System Bold", 16));
         postVBox.getChildren().add(postDetails);
 
@@ -252,36 +297,52 @@ public class AdminInterfaceController {
         postVBox.getChildren().add(postDate);
 
         // Add the post reporter
-        Label postReporter = new Label("Reported by: " + UserSystem.getInstance().getUserById(report.getReportingUserId()));
+        Label postReporter = new Label("Reported by: " + UserSystem.getInstance().getUserById(report.getReportingUserId()).getUsername());
         postVBox.getChildren().add(postReporter);
+
+        // Add the post status
+        Label postStatus = new Label("Status: " + report.getStatus().toString());
+        postVBox.getChildren().add(postStatus);
 
         // Add Hbox for buttons
         HBox buttonHBox = new HBox(10);
         postVBox.getChildren().add(buttonHBox);
 
-        // Add the dismiss button
-        Button dismissButton = new Button("Dismiss Report");
-        dismissButton.setOnAction(event -> {
-            report.setStatus(Report.Status.CLOSED);
-            report.setDateReported(new Date());
-            ReportSystemController.getInstance().closePostReport(report);
-            loadPostReports();
-            reportStage.close();
+        if (report.getStatus().equals(Report.Status.OPENED)) {
+            // Add the dismiss button
+            Button dismissButton = new Button("Dismiss");
+            dismissButton.setOnAction(event -> {
+                report.setStatus(Report.Status.CLOSED);
+                report.setDateReported(new Date());
+                if (report instanceof PostReport postReport) {
+                    ReportSystemController.getInstance().closePostReport(postReport);
+                } else if (report instanceof UserReport userReport) {
+                    ReportSystemController.getInstance().closeUserReport(userReport);
+                }
+                loadPostReports();
+                loadUserReports();
+                reportStage.close();
+            });
+            buttonHBox.getChildren().add(dismissButton);
 
-        });
-        buttonHBox.getChildren().add(dismissButton);
-
-        // Add the delete button
-        Button deleteButton = new Button("Delete Post");
-        deleteButton.setOnAction(event -> {
-            ReportSystemController.getInstance().deletePost(report.getReportedPostId());
-            report.setStatus(Report.Status.CLOSED);
-            report.setDateReported(new Date());
-            ReportSystemController.getInstance().closePostReport(report);
-            loadPostReports();
-            reportStage.close();
-        });
-        buttonHBox.getChildren().add(deleteButton);
+            // Add the delete button
+            Button deleteButton = new Button("Delete");
+            deleteButton.setOnAction(event -> {
+                if (report instanceof PostReport postReport) {
+                    ReportSystemController.getInstance().deletePost(postReport.getReportedPostId());
+                    ReportSystemController.getInstance().closePostReport(postReport);
+                } else if (report instanceof UserReport userReport) {
+                    ReportSystemController.getInstance().deleteUser(userReport.getReportedUserId());
+                    ReportSystemController.getInstance().closeUserReport(userReport);
+                }
+                report.setStatus(Report.Status.CLOSED);
+                report.setDateReported(new Date());
+                loadPostReports();
+                loadUserReports();
+                reportStage.close();
+            });
+            buttonHBox.getChildren().add(deleteButton);
+        }
 
         // Set the VBox in a Scene
         Scene postScene = new Scene(postVBox, 400, 400);
@@ -289,6 +350,17 @@ public class AdminInterfaceController {
 
         // Show the new Stage
         reportStage.show();
+    }
+
+    private String getFormattedDateTime(Date postDate) {
+        // Convert Date to LocalDateTime
+        LocalDateTime localDateTime = postDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        // Define a formatter for the desired format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        // Format the date and return the result
+        return localDateTime.format(formatter);
     }
 
     private void openUserProfileWindow(UserAccount user) {
@@ -326,37 +398,5 @@ public class AdminInterfaceController {
 
         // Show the new Stage
         profileStage.show();
-    }
-
-    private void loadUserReports() {
-        openUserReportsTableView.getItems().clear();
-        closedUserReportsTableView.getItems().clear();
-
-        openUserReportsId.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getId()).asObject());
-        openUserReportsDate.setCellValueFactory(
-                cellData -> new SimpleStringProperty(getFormattedDateTime(cellData.getValue().getDateReported())));
-        closedUserReportsId.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getId()).asObject());
-        closedUserReportsDate.setCellValueFactory(
-                cellData -> new SimpleStringProperty(getFormattedDateTime(cellData.getValue().getDateReported())));
-
-        // Load open reports
-        for (UserReport report : ReportSystem.getInstance().getUserReports()) {
-            if (report.getStatus() == Report.Status.OPENED) {
-                openUserReportsTableView.getItems().add(report);
-            } else {
-                closedUserReportsTableView.getItems().add(report);
-            }
-        }
-    }
-
-    private String getFormattedDateTime(Date postDate) {
-        // Convert Date to LocalDateTime
-        LocalDateTime localDateTime = postDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-
-        // Define a formatter for the desired format
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
-        // Format the date and return the result
-        return localDateTime.format(formatter);
     }
 }

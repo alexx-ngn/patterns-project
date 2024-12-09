@@ -62,10 +62,10 @@ public class UserSystem {
         return posts;
     }
 
-    public String getUserById(int userId) {
+    public UserAccount getUserById(int userId) {
         for (UserAccount user : userAccounts) {
             if (user.getId() == userId) {
-                return user.getName();
+                return user;
             }
         }
         return null;

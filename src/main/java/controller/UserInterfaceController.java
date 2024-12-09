@@ -110,7 +110,7 @@ public class UserInterfaceController {
         UserSystem.getInstance().getAllPosts().forEach(post -> {
             // Get the current date and time
             Date postDate = post.getDatePosted();
-            String username = UserSystem.getInstance().getUserById(post.getUserId());
+            String username = UserSystem.getInstance().getUserById(post.getUserId()).getUsername();
 
             String header = username + " - " + getFormattedDateTime(postDate);
             addPostToFeed(header, post.getText(), post);
@@ -218,7 +218,6 @@ public class UserInterfaceController {
         reportButton.setOnAction(event -> handleReportButton(post));
 
         // Update counterLabel value
-//        Post post = UserSystemController.getInstance().getPostById(post.getId());
         counterLabel.setText("" + post.getLikes());
 
         // Add reaction elements to HBox
