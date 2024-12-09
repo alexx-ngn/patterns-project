@@ -146,17 +146,19 @@
                                  <children>
                                     <VBox fx:id="searchVBox">
                                        <children>
-                                          <HBox>
+                                          <VBox>
                                              <children>
-                                                <Label fx:id="searchLabel" text="%search.label">
-                                                   <font>
-                                                      <Font size="24.0" />
-                                                   </font>
-                                                </Label>
-                                                <TextField fx:id="searchTextField" prefHeight="35.0" prefWidth="242.0" />
-                                                <Button fx:id="searchProfileButton" mnemonicParsing="false" prefHeight="34.0" prefWidth="98.0" text="%search.button" />
+                                                <HBox>
+                                                    <Label fx:id="searchLabel" text="%search.label">
+                                                        <font>
+                                                            <Font size="24.0" />
+                                                        </font>
+                                                    </Label>
+                                                    <TextField fx:id="searchTextField" prefHeight="35.0" prefWidth="242.0" />
+                                                    <Button fx:id="searchProfileButton" mnemonicParsing="false" prefHeight="34.0" prefWidth="98.0" text="%search.button" onAction="#handleSearchProfileButton"/>
+                                                </HBox>
                                              </children>
-                                          </HBox>
+                                          </VBox>
                                           <HBox prefHeight="17.0" prefWidth="1150.0" spacing="10.0">
                                              <children>
                                                 <Label text="Username">

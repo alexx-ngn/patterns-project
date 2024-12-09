@@ -2,6 +2,7 @@ package controller;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -324,6 +325,8 @@ public class UserInterfaceController {
         // Create Label
         Label usernameLabel = new Label(user.getUsername());
         usernameLabel.setFont(new Font(20.0));
+        // Add click event to the usernameLabel to open profile
+        usernameLabel.setOnMouseClicked(event -> openUserProfileWindow(user));
 
         //Create Region
         Region region = new Region();
@@ -346,6 +349,43 @@ public class UserInterfaceController {
         searchVBox.getChildren().add(hbox);
     }
 
+    private void openUserProfileWindow(UserAccount user) {
+        // Create a new Stage
+        Stage profileStage = new Stage();
+        profileStage.setTitle(user.getUsername() + "'s Profile");
+
+        // Create a VBox to hold the user's posts
+        VBox profileVBox = new VBox(10);
+        profileVBox.setPadding(new Insets(10));
+
+        // Add a title Label
+        Label profileTitle = new Label("Posts by " + user.getUsername());
+        profileTitle.setFont(new Font("System Bold", 18));
+
+        profileVBox.getChildren().add(profileTitle);
+
+        // Fetch the user's posts and add them to the VBox
+        UserSystem.getInstance().getPostsByUser(user).forEach(post -> {
+            String header = user.getUsername() + " - " + getFormattedDateTime(post.getDatePosted());
+            Label postHeader = new Label(header);
+            postHeader.setFont(new Font(16.0));
+
+            Label postContent = new Label(post.getText());
+            postContent.setWrapText(true);
+
+            VBox postBox = new VBox(5, postHeader, postContent);
+            postBox.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-padding: 5;");
+            profileVBox.getChildren().add(postBox);
+        });
+
+        // Set the VBox in a Scene
+        Scene profileScene = new Scene(profileVBox, 400, 600);
+        profileStage.setScene(profileScene);
+
+        // Show the new Stage
+        profileStage.show();
+    }
+
     @FXML
     void handleHomeButton() {
         userTabPane.getSelectionModel().select(0);
@@ -359,6 +399,17 @@ public class UserInterfaceController {
     @FXML
     void handleProfileButton() {
         userTabPane.getSelectionModel().select(2); // Switch to the profile tab
+    }
+
+    @FXML
+    void handleSearchProfileButton() {
+        searchVBox.getChildren().removeIf(node -> node instanceof HBox);
+
+        UserSystem.getInstance().getUserAccounts().forEach(user -> {
+            if (user.getUsername().contains(searchTextField.getText())) {
+                addProfilesToSearch(user);
+            }
+        });
     }
 
     // Method to handle removing a post
