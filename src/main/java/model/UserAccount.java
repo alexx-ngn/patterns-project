@@ -30,11 +30,21 @@ public class UserAccount extends Account {
         this.posts = new ArrayList<>();
     }
 
+    /**
+     * Removes a specified post from the user's list of posts.
+     *
+     * @param post the post to be removed from the user's list of posts
+     */
     @Override
     public void removePost(Post post) {
         posts.remove(post);
     }
 
+    /**
+     * Updates the follower count of the user account to reflect the current size
+     * of the set of follower IDs. This method should be called whenever the
+     * list of followers is modified to ensure the follower count remains accurate.
+     */
     public void followUnfollow() {
         followerCount = followerids.size();
     }

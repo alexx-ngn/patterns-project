@@ -39,6 +39,12 @@ public class Post {
         this.datePosted = datePosted;
     }
 
+    /**
+     * Updates the number of likes on the post by setting it to the current size
+     * of the set containing user IDs who have liked the post. This method is used
+     * to synchronize the like count variable with the actual number of unique
+     * users who have expressed a like for the post.
+     */
     public void likeUnlike() {
         likes = likedByUserIds.size();
     }

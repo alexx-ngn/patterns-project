@@ -45,6 +45,14 @@ public class LoginInterfaceController {
     @FXML
     private Hyperlink registerHyperlink;
 
+    /**
+     * Handles the action triggered by pressing the login button.
+     * This method attempts to authenticate the user as an admin or a standard user.
+     * Upon successful authentication, it navigates to the respective dashboard based on the user type.
+     * If authentication fails, an error alert is displayed.
+     *
+     * @param event the ActionEvent triggered by the login button press
+     */
     @FXML
     void handleLoginButton(ActionEvent event) {
         boolean adminLoginSuccessful = ReportSystem.getInstance().authenticateAdmin(usernameTextField.getText(), passwordField.getText());
@@ -95,6 +103,12 @@ public class LoginInterfaceController {
         }
     }
 
+    /**
+     * Handles the action event triggered when the register hyperlink is clicked.
+     * This method hides the current login window and opens the registration interface.
+     *
+     * @param event the action event triggered by clicking the register hyperlink
+     */
     @FXML
     void handleRegisterHyperlink(ActionEvent event) {
         this.loginPane.getScene().getWindow().hide();
@@ -105,6 +119,12 @@ public class LoginInterfaceController {
         }
     }
 
+    /**
+     * Handles the action event triggered by changing the language selection in the languageComboBox.
+     * Updates the application's locale based on the selected language and refreshes the user interface labels.
+     *
+     * @param event the ActionEvent that triggered this handler
+     */
     @FXML
     void handleLanguageSelector(ActionEvent event) {
         String selectedLanguage = languageComboBox.getValue();
@@ -115,6 +135,16 @@ public class LoginInterfaceController {
         updateLabels();
     }
 
+    /**
+     * Updates the text and prompt text of user interface components with the current locale's resource bundle values.
+     *
+     * This method fetches the appropriate language resources from a resource bundle
+     * specific to the "Login" scene and updates the text for the login button,
+     * register hyperlink, username label, password label, and the prompt text for
+     * username and password input fields using the retrieved language strings.
+     * It synchronizes the UI text components with the localized string values, allowing
+     * the interface to be displayed in the correct language.
+     */
     private void updateLabels() {
         ResourceBundle bundle = LanguageManager.getInstance().getResourceBundle("Login");
         loginButton.setText(bundle.getString("login.button"));
@@ -125,6 +155,14 @@ public class LoginInterfaceController {
         passwordField.setPromptText(bundle.getString("password.label"));
     }
 
+    /**
+     * Initializes the components of the login interface. This method sets up
+     * the localization resources and default language selections for the user interface.
+     * It populates the language selection combo box with available language options
+     * and sets the default selected value. Updates the labels of UI elements based on
+     * the localized resource bundle to ensure the interface is displayed in the correct
+     * language at startup.
+     */
     @FXML
     public void initialize() {
         ResourceBundle bundle = LanguageManager.getInstance().getResourceBundle("Login");

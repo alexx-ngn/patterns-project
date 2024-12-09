@@ -35,7 +35,7 @@ public abstract class Account {
      * depending on user removing post it differs:
      * regular user: can only remove own posts
      * admin: can remove any post
-     * @param post
+     * @param post post to remove
      */
     public abstract void removePost(Post post);
 }

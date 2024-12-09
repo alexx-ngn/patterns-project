@@ -16,6 +16,10 @@ public class DatabaseController {
 
     private DatabaseController() {}
 
+    /**
+     * Singleton implementation of this class, ensures that only one can be istantiated
+     * @return instance of this singleton
+     */
     public static DatabaseController getInstance() {
         if (instance == null) {
             synchronized (DatabaseController.class) {
@@ -138,6 +142,9 @@ public class DatabaseController {
         executeDdlAndDml(sql);
     }
 
+    /**
+     * creates all tables within the db
+     */
     public static void createAllTables() {
         createTable(CREATE_ADMIN_TABLE);
         createTable(CREATE_USER_TABLE);
@@ -530,6 +537,10 @@ public class DatabaseController {
         return getUserAccounts(sql);
     }
 
+    /**
+     * Selects all posts within db
+     * @return List of all posts
+     */
     public static List<Post> selectAllPosts() {
         READ_LOCK.lock();
         String sql = "SELECT * FROM posts";
@@ -730,7 +741,7 @@ public class DatabaseController {
     }
 
     /**
-     * Selects a post record from a table
+     * Executes the select post query but with a check
      * @param sql the SELECT statement to execute
      */
     public static List<Post> selectPostRecord(String sql) {
@@ -740,6 +751,11 @@ public class DatabaseController {
         return executeSelectPosts(sql);
     }
 
+    /**
+     * Executes a select from posts statement with conditionals (WHERE)
+     * @param sql sql string to run
+     * @return List of posts that match query
+     */
     private static List<Post> executeSelectPosts(String sql) {
         READ_LOCK.lock();
         try (Connection connection = connect(DB_PATH);
@@ -765,6 +781,10 @@ public class DatabaseController {
         }
     }
 
+    /**
+     * Executes the select user query but with a check
+     * @param sql the SELECT statement to execute
+     */
     public static List<UserAccount> selectUserRecord(String sql) {
         if (!sql.toUpperCase().contains("SELECT")) {
             throw new IllegalArgumentException("SQL statement must be a SELECT statement");
@@ -772,6 +792,11 @@ public class DatabaseController {
         return executeSelectUser(sql);
     }
 
+    /**
+     * Executes a select from users statement with conditionals (WHERE)
+     * @param sql sql string to run
+     * @return List of users that match query
+     */
     private static List<UserAccount> executeSelectUser(String sql) {
         READ_LOCK.lock();
         try (Connection connection = connect(DB_PATH);
@@ -798,6 +823,10 @@ public class DatabaseController {
         }
     }
 
+    /**
+     * Executes the select admin query but with a check
+     * @param sql the SELECT statement to execute
+     */
     public static List<AdminAccount> selectAdminRecord(String sql) {
         if (!sql.toUpperCase().contains("SELECT")) {
             throw new IllegalArgumentException("SQL statement must be a SELECT statement");
@@ -805,6 +834,11 @@ public class DatabaseController {
         return executeSelectAdmin(sql);
     }
 
+    /**
+     * Executes a select from admins statement with conditionals (WHERE)
+     * @param sql sql string to run
+     * @return List of admins that match query
+     */
     private static List<AdminAccount> executeSelectAdmin(String sql) {
         READ_LOCK.lock();
         try (Connection connection = connect(DB_PATH);

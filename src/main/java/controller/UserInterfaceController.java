@@ -75,14 +75,37 @@ public class UserInterfaceController {
     @FXML
     private VBox profileVBox;
 
+    /**
+     * Represents the locale settings used by the UserInterfaceController to
+     * localize and update the user interface text according to the specified
+     * language and region.
+     *
+     * The locale is critical in determining the ResourceBundle that is loaded
+     * to fetch the correct localized strings for various UI components like
+     * labels and buttons.
+     */
     private Locale locale;
 
 
+    /**
+     * Sets the locale for the user interface and updates all labels accordingly.
+     * This method changes the language or region settings, which adjusts the text labels
+     * in the application to the appropriate language defined by the given locale.
+     *
+     * @param locale the Locale to be set for the application, which determines the language
+     *               and regional settings for the user interface text elements.
+     */
     public void setLocale(Locale locale) {
         this.locale = locale;
         updateLabels();
     }
 
+    /**
+     * Updates the text labels and buttons in the user interface to reflect the current locale settings.
+     * This method retrieves the appropriate localized strings from a ResourceBundle and sets them on
+     * various UI components such as labels and buttons, ensuring that all user interface elements
+     * are displayed in the correct language.
+     */
     private void updateLabels() {
         ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
         welcomeLabel.setText(bundle.getString("welcome.label") + " " + UserSystem.getInstance().getCurrentUser().getName());
@@ -97,10 +120,31 @@ public class UserInterfaceController {
         homeButton.setText(bundle.getString("home.button"));
     }
 
+    /**
+     * Hides all the tabs in the user interface. This method is typically used
+     * during the initialization process to ensure that tabs are not visible
+     * to the user until they are explicitly needed. The exact implementation
+     * details depend on the UserInterfaceController's configuration, including
+     * which tabs are available and how they should be controlled.
+     * The method is called as part of the setup process after components such
+     * as the feed, search, and profile views are loaded.
+     */
     private void hideTabs() {
 
     }
 
+    /**
+     * Loads and displays the user's feed with posts from all users.
+     *
+     * This method clears the existing feed display by removing all children
+     * nodes that are instances of VBox from feedVBox. It retrieves all posts
+     * from the UserSystem's singleton instance and processes each post to
+     * extract relevant information such as the post's date, and the username of
+     * the user who published the post. These details are then formatted into
+     * a header string. Finally, each post is added to the feed display by
+     * calling addPostToFeed, which integrates the constructed header, the
+     * content of the post, and the post object itself.
+     */
     private void loadFeed() {
         feedVBox.getChildren().removeIf(node -> node instanceof VBox);
 
@@ -114,12 +158,30 @@ public class UserInterfaceController {
         });
     }
 
+    /**
+     * Clears the searchVBox of all nodes except the first one, then populates it
+     * with user profiles by iterating through each user account in the UserSystem.
+     * Each user account is passed to the addProfilesToSearch method to be
+     * displayed in the search interface.
+     */
     private void loadSearch() {
         searchVBox.getChildren().removeIf(node -> searchVBox.getChildren().indexOf(node) > 0);
 
         UserSystem.getInstance().getUserAccounts().forEach(this::addProfilesToSearch);
     }
 
+    /**
+     * Loads the current user's profile by clearing existing posts from the profile view
+     * and adding the user's posts from the system to the profile VBox.
+     *
+     * The method first removes any nodes of type VBox from the profileVBox, ensuring
+     * that the view is cleared before new posts are loaded.
+     * It then retrieves the current user from the UserSystem singleton instance
+     * and gets all posts associated with this user.
+     * For each post, the method creates a header using the user's name and the formatted
+     * date of the post, and then adds this information along with the post's text
+     * to the profile view via the addPostToProfile helper method.
+     */
     private void loadProfile() {
         profileVBox.getChildren().removeIf(node -> node instanceof VBox);
 
@@ -129,6 +191,17 @@ public class UserInterfaceController {
         });
     }
 
+    /**
+     * Converts a given Date object to a formatted string representation
+     * using the pattern "yyyy-MM-dd HH:mm".
+     *
+     * @param postDate the Date object to be formatted. Must not be null.
+     * @return a string formatted as "yyyy-MM-dd HH:mm" representing the
+     *         specified date and time.
+     * @throws IllegalArgumentException if the postDate is null.
+     * @throws UnsupportedOperationException if the conversion of postDate
+     *         is not supported.
+     */
     private String getFormattedDateTime(Date postDate) {
         if (postDate == null) {
             throw new IllegalArgumentException("postDate cannot be null");
@@ -149,6 +222,18 @@ public class UserInterfaceController {
         }
     }
 
+    /**
+     * Initializes the user interface components and settings for the application.
+     * This method is automatically called when the FXML file is loaded.
+     *
+     * The following operations are performed during initialization:
+     * 1. Sets the locale for the application if it has not been previously set.
+     * 2. Loads the feed content into the user interface.
+     * 3. Loads the search functionalities and profiles.
+     * 4. Loads the user's profile details and posts.
+     * 5. Updates all UI labels to match the current locale settings.
+     * 6. Hides certain tabs based on user permissions or initial settings.
+     */
     @FXML
     public void initialize() {
         if (locale == null) {
@@ -161,6 +246,19 @@ public class UserInterfaceController {
         hideTabs();
     }
 
+    /**
+     * Handles the action event triggered by clicking the "Post" button in the user interface.
+     * This method opens a dialog for the user to input a post. If the input is not empty,
+     * it processes and posts the content using the current user's account.
+     *
+     * The method performs the following actions:
+     * 1. Presents a `TextInputDialog` with a title and header fetched from resource bundles
+     *    to accommodate locale-specific language settings.
+     * 2. Replaces the default input field of the dialog with a `TextArea` for a better user experience.
+     * 3. Waits for the user to submit the content, and if the content is non-empty, uses
+     *    `UserSystemController` to send the post content for the current user to the backend.
+     * 4. Refreshes the user's feed and profile view to reflect the newly posted content.
+     */
     @FXML
     void handlePostButton() {
         TextInputDialog dialog = new TextInputDialog();
@@ -185,6 +283,16 @@ public class UserInterfaceController {
         });
     }
 
+    /**
+     * Adds a post to the feed display. This method creates a new visual representation of a post
+     * in a VBox and adds it to the user interface. The post includes a header, content, and a set of
+     * reaction controls such as like and report buttons.
+     *
+     * @param headerText The text to be displayed in the header of the post. Typically includes the
+     *                   username and the date/time the post was made.
+     * @param postContent The content of the post to be displayed.
+     * @param post The Post object containing data about likes and other metadata.
+     */
     private void addPostToFeed(String headerText, String postContent, Post post) {
         // Create a VBox for the post
         VBox postBox = new VBox();
@@ -216,7 +324,6 @@ public class UserInterfaceController {
         reportButton.setOnAction(event -> handleReportButton(post));
 
         // Update counterLabel value
-//        Post post = UserSystemController.getInstance().getPostById(post.getId());
         counterLabel.setText("" + post.getLikes());
 
         // Add reaction elements to HBox
@@ -229,6 +336,14 @@ public class UserInterfaceController {
         feedVBox.getChildren().add(1, postBox); // Add at the top of the feed
     }
 
+    /**
+     * Handles the action of reporting a post by displaying a dialog
+     * for the user to specify a reason. If a valid reason is provided,
+     * the post is reported through the UserSystemController, and the
+     * feed view is updated.
+     *
+     * @param post the post to be reported
+     */
     private void handleReportButton(Post post) {
         TextInputDialog dialog = new TextInputDialog();
         ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
@@ -251,6 +366,12 @@ public class UserInterfaceController {
         loadFeed();
     }
 
+    /**
+     * Handles the report button action for reporting a user account. It presents a dialog to input
+     * the reason for reporting the user and then processes the report if a valid reason is provided.
+     *
+     * @param user the user account that is being reported
+     */
     private void handleReportButton(UserAccount user) {
         TextInputDialog dialog = new TextInputDialog();
         ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
@@ -274,6 +395,17 @@ public class UserInterfaceController {
     }
 
 
+    /**
+     * Adds a post to the user's profile view by creating a visual representation of the post
+     * using JavaFX components such as VBox, Label, and HBox. The method sets up the layout
+     * and interactions for the post's display, including headers, content, and reaction buttons.
+     *
+     * @param headerText   the text to be displayed as the header of the post, usually containing
+     *                     the username and the post date.
+     * @param postContent  the main content text of the post.
+     * @param post         the Post object that contains details and functionality related to the
+     *                     post such as like count and user interactions.
+     */
     // Helper method to add a post to the profileVBox
     private void addPostToProfile(String headerText, String postContent, Post post) {
         // Create a VBox for the post
@@ -299,7 +431,6 @@ public class UserInterfaceController {
 
         // Reaction elements
         Label counterLabel = new Label("0");
-//        counterLabel.setText(String.valueOf(handleLikeButton(counterLabel, postId)));
         counterLabel.setStyle("-fx-padding: 10;");
         Button likeButton = new Button("👍");
         likeButton.setOnAction(event -> handleLikeButton(counterLabel, post));
@@ -307,7 +438,6 @@ public class UserInterfaceController {
         removeButton.setOnAction(event -> handleRemovePost(post));
 
         // Update counterLabel value
-//        Post updatedPost = UserSystemController.getInstance().getPostById(post.getId());
         counterLabel.setText("" + post.getLikes());
 
         // Add reaction elements to HBox
@@ -320,6 +450,13 @@ public class UserInterfaceController {
         profileVBox.getChildren().add(1, postBox);
     }
 
+    /**
+     * Adds a user's profile to the search results displayed in the user interface.
+     * This method creates and configures GUI components to represent the user's profile,
+     * including a label with the user's username and a button to report the user.
+     *
+     * @param user the user account whose profile should be added to the search results
+     */
     private void addProfilesToSearch(UserAccount user) {
         // Create Label
         Label usernameLabel = new Label(user.getUsername());
@@ -348,6 +485,15 @@ public class UserInterfaceController {
         searchVBox.getChildren().add(hbox);
     }
 
+    /**
+     * Opens a new window displaying the profile of the specified user.
+     * The window contains the user's username, follower count, a follow/unfollow button,
+     * and a list of the user's posts. The posts are displayed with a header containing
+     * the date posted and the content of the post in a styled format.
+     * The follow/unfollow button updates in real-time to reflect the current following status.
+     *
+     * @param user the user account whose profile is to be displayed
+     */
     private void openUserProfileWindow(UserAccount user) {
         // Create a new Stage
         Stage profileStage = new Stage();
@@ -408,21 +554,47 @@ public class UserInterfaceController {
         profileStage.show();
     }
 
+    /**
+     * Handles the action for the home button in the user interface.
+     * This method sets the selection of the userTabPane to the first tab,
+     * which typically represents the home or default view for the user.
+     */
     @FXML
     void handleHomeButton() {
         userTabPane.getSelectionModel().select(0);
     }
 
+    /**
+     * Handles the action event triggered by the search button.
+     * This method selects the tab at index 1 in the userTabPane,
+     * which is presumed to be associated with the search functionality of the application.
+     */
     @FXML
     void handleSearchButton() {
         userTabPane.getSelectionModel().select(1);
     }
 
+    /**
+     * Handles the action triggered by the profile button.
+     * Selects the profile tab in the user interface by changing the selection model
+     * of the userTabPane to the third tab, which corresponds to the user's profile view.
+     */
     @FXML
     void handleProfileButton() {
         userTabPane.getSelectionModel().select(2); // Switch to the profile tab
     }
 
+    /**
+     * Handles the event triggered by clicking the "Search Profile" button.
+     * This method searches for user profiles whose usernames contain the text
+     * entered in the search text field, and displays the matching profiles.
+     *
+     * It first clears any existing search results by removing HBox nodes from
+     * the searchVBox. Then, it iterates through all user accounts retrieved
+     * from the UserSystem singleton instance. For each user, if the username
+     * contains the text entered in the searchTextField, the user profile is
+     * added to the search results using the private method addProfilesToSearch.
+     */
     @FXML
     void handleSearchProfileButton() {
         searchVBox.getChildren().removeIf(node -> node instanceof HBox);
@@ -434,6 +606,13 @@ public class UserInterfaceController {
         });
     }
 
+    /**
+     * Handles the removal of a specified post. This method removes the post,
+     * updates the backend system through the UserSystemController, and refreshes
+     * the profile and feed views to reflect the changes.
+     *
+     * @param post the Post object to be removed
+     */
     // Method to handle removing a post
     private void handleRemovePost(Post post) {
         // Logic to remove a post (e.g., from the backend and update the UI)
@@ -444,6 +623,19 @@ public class UserInterfaceController {
         loadFeed();
     }
 
+    /**
+     * Handles the action event for the logout button. This method closes the
+     * current application window associated with the user interface and relaunches
+     * the login interface.
+     *
+     * It retrieves the current stage (window) from the user interface context,
+     * closes it, and then attempts to start a new instance of the `LoginInterface`
+     * to present the login screen. In the event of an exception during the
+     * relaunch of the login screen, it propagates the exception as a
+     * `RuntimeException`.
+     *
+     * @throws RuntimeException if an exception occurs while starting the login interface
+     */
     @FXML
     void handleLogoutButton() {
         Stage currentStage = (Stage) this.userTabPane.getScene().getWindow();
@@ -455,6 +647,14 @@ public class UserInterfaceController {
         }
     }
 
+    /**
+     * Handles the action of clicking the like button on a post. This method toggles the like state
+     * of the current user on the specified post, either adding or removing the user's like. It
+     * updates the post's like counter label to reflect the current number of likes.
+     *
+     * @param counterLabel the label displaying the number of likes on the post
+     * @param post the post being liked or unliked by the current user
+     */
     @FXML
     private void handleLikeButton(Label counterLabel, Post post) {
         // Check if current user has liked already to then either like or dislike the post
@@ -469,6 +669,14 @@ public class UserInterfaceController {
         loadFeed();
     }
 
+    /**
+     * Handles the action of following or unfollowing a user when the follow button is clicked.
+     * Adjusts the follow button text and updates the followers count displayed on the label.
+     *
+     * @param followersLabel the label displaying the number of followers, which will be updated after the action
+     * @param followButton the button that initiates the follow/unfollow action and whose text will be updated
+     * @param followed the user account that is being followed or unfollowed
+     */
     @FXML
     private void handleFollowButton(Label followersLabel, Button followButton, UserAccount followed) {
         if (!followed.getFollowerids().contains(UserSystem.getInstance().getCurrentUser().getId())) {
@@ -482,6 +690,13 @@ public class UserInterfaceController {
         });
     }
 
+    /**
+     * Determines whether the current user should follow or unfollow a specified user account.
+     *
+     * @param user the UserAccount to check for a following relationship with the current user
+     * @return "Follow" if the current user does not follow the specified user, "Unfollow" if the current user already follows the specified user, or null if neither condition is
+     *  met
+     */
     private String followOrUnfollow(UserAccount user) {
         if (user.getFollowerids().contains(UserSystem.getInstance().getCurrentUser().getId())) {
             return "Unfollow";

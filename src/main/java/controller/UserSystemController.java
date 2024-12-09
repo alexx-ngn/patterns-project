@@ -12,12 +12,36 @@ public class UserSystemController {
     private UserSystem userSystem;
     private static ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
+    /**
+     * The singleton instance of the UserSystemController class.
+     *
+     * This instance is used to coordinate actions across the user system,
+     * such as user management, post interactions, and administrative functions.
+     * It ensures that there is only one instance of UserSystemController
+     * throughout the application, providing a centralized point of access
+     * for managing user-related operations.
+     */
     private static UserSystemController instance;
 
+    /**
+     * Private constructor for UserSystemController, initializing the userSystem instance.
+     * This constructor ensures that the UserSystemController follows the singleton design pattern
+     * by being inaccessible from outside the class and using the UserSystem singleton instance.
+     * The userSystem is initialized by fetching the single instance of UserSystem.
+     */
     private UserSystemController() {
         userSystem = UserSystem.getInstance();
     }
 
+    /**
+     * Returns the singleton instance of the UserSystemController. This method
+     * implements a double-checked locking mechanism to ensure that only one
+     * instance of UserSystemController is created during the application's
+     * lifetime. If the instance is null, it initializes it within a synchronized
+     * block to ensure thread safety.
+     *
+     * @return the single instance of UserSystemController.
+     */
     public static UserSystemController getInstance() {
         if (instance == null) {
             synchronized (UserSystemController.class) {
@@ -29,8 +53,11 @@ public class UserSystemController {
         return instance;
     }
 
-    // TODO:
-
+    /**
+     * Adds a new user account to the system and inserts a corresponding record into the database.
+     *
+     * @param userAccount the UserAccount object representing the user to be added
+     */
     public void addUser(UserAccount userAccount) {
         // threadPool.submit(() -> {
             userSystem.getUserAccounts().add(userAccount);
@@ -40,6 +67,12 @@ public class UserSystemController {
         // });
     }
 
+    /**
+     * Allows a user account to create and store a post with the specified text.
+     *
+     * @param userAccount the user account creating the post
+     * @param text the text content of the post
+     */
     public void userPost(UserAccount userAccount, String text) {
         // threadPool.submit(() -> {
         Post post = userAccount.post(text);
@@ -52,6 +85,14 @@ public class UserSystemController {
         // });
     }
 
+    /**
+     * Removes a post from a user's account and the system's list of posts.
+     * It deletes the post record from the database and ensures it's no longer
+     * associated with the provided user account.
+     *
+     * @param userAccount The user account from which the post is to be removed.
+     * @param post The post to be removed from the user's account and the system.
+     */
     public void userRemovePost(UserAccount userAccount, Post post) {
         // threadPool.submit(() -> {
             String sql = DatabaseController.generateDeleteStatement("posts", "id", post.getId());
@@ -63,6 +104,14 @@ public class UserSystemController {
         // });
     }
 
+    /**
+     * Allows one user to follow another user within the application. This method handles
+     * the database operations required to establish the follow relationship between the users,
+     * updates the list of follower IDs for the followed user, and adjusts the follower count accordingly.
+     *
+     * @param follower the UserAccount who is initiating the follow action
+     * @param followed the UserAccount who is being followed
+     */
     public void userFollowUser(UserAccount follower, UserAccount followed) {
         // threadPool.submit(() -> {
         String sql = DatabaseController.generateFullInsertStatement("follows", follower.getId(), followed.getId());
@@ -76,6 +125,13 @@ public class UserSystemController {
         // });
     }
 
+    /**
+     * Facilitates the action of a user unfollowing another user in the system.
+     * Updates the database records and the in-memory user account data to reflect the change.
+     *
+     * @param unfollower The UserAccount instance representing the user who is initiating the unfollow action.
+     * @param unfollowed The UserAccount instance representing the user who is being unfollowed.
+     */
     public void userUnfollowUser(UserAccount unfollower, UserAccount unfollowed) {
         // threadPool.submit(() -> {
         String sql = DatabaseController.generateDeleteStatement("follows", "followerId", unfollower.getId(), "followeeId", unfollowed.getId());
@@ -89,6 +145,14 @@ public class UserSystemController {
         // });
     }
 
+    /**
+     * Allows a user to like a post. This method will insert a like record into
+     * the database, update the post's liked user IDs, adjust the number of likes,
+     * and update the post's record in the database.
+     *
+     * @param userId the ID of the user who is liking the post
+     * @param post the Post object representing the post being liked
+     */
     public void userLikePost(int userId, Post post) {
         // threadPool.submit(() -> {
         // Insert likes record
@@ -105,6 +169,15 @@ public class UserSystemController {
         // });
     }
 
+    /**
+     * Allows a user to unlike a post. This method removes the like record
+     * from the database, updates the post properties by fetching the current
+     * list of users who liked the post, and updates the number of likes
+     * associated with the post in the database.
+     *
+     * @param userAccount the user account of the user unliking the post
+     * @param post the post that is being unliked
+     */
     public void userUnlikePost(UserAccount userAccount, Post post) {
         // threadPool.submit(() -> {
         // Remove likes record
@@ -121,6 +194,15 @@ public class UserSystemController {
         // });
     }
 
+    /**
+     * Submits a report for a specified post made by a user. The report includes the post in question,
+     * the reason for reporting, and the reporter's details. The report is then persisted in the database
+     * and added to the open reports pool in the ReportSystem.
+     *
+     * @param reporter The user account submitting the report.
+     * @param post The post being reported.
+     * @param reason The reason provided by the reporter for reporting the post.
+     */
     public void reportPost(UserAccount reporter, Post post, String reason) {
 //        threadPool.submit(() -> {
             PostReport postReport = reporter.reportPost(post, reason);
@@ -138,6 +220,14 @@ public class UserSystemController {
 
     }
 
+    /**
+     * Reports a user for a specific reason, generating a user report and inserting it into the database.
+     * The report is added to the system's list of open reports.
+     *
+     * @param reporter the user account that is reporting another user
+     * @param target the user account being reported
+     * @param reportReason the reason given for reporting the user
+     */
     public void reportUser(UserAccount reporter, UserAccount target, String reportReason) {
         UserReport userReport = reporter.reportAccount(target, reportReason);
         String sql = DatabaseController.generateInsertStatement(
@@ -151,16 +241,34 @@ public class UserSystemController {
         ReportSystem.getInstance().getOpenReports().add(userReport);
     }
 
+    /**
+     * Retrieves a post with a specific ID from the database.
+     *
+     * @param postId the unique identifier of the post to retrieve
+     * @return the Post object corresponding to the specified ID, or null if no such post exists
+     */
     public Post getPostById(int postId) {
         String sql = DatabaseController.generateSelectStatement("posts", "id", postId);
         return DatabaseController.selectPostRecord(sql).getFirst();
     }
 
+    /**
+     * Retrieves a UserAccount object based on the provided username.
+     *
+     * @param username the username of the user whose account information is to be retrieved
+     * @return the UserAccount associated with the given username
+     */
     public UserAccount getUserByUsername(String username) {
         String sql = DatabaseController.generateSelectStatement("users", "username", username);
         return DatabaseController.selectUserRecord(sql).getFirst();
     }
 
+    /**
+     * Removes the specified post from the system both in memory and in the database.
+     * This operation is asynchronous and will be handled by a thread pool.
+     *
+     * @param post The post to be removed by an administrator.
+     */
     public void adminRemovePost(Post post) {
         threadPool.submit(() -> {
             userSystem.getAllPosts().remove(post);
@@ -171,6 +279,13 @@ public class UserSystemController {
         });
     }
 
+    /**
+     * Bans a user account by removing it from the user system and deleting any associated post reports
+     * from the database. The banning action is performed by an admin account.
+     *
+     * @param adminAccount The admin account performing the ban action.
+     * @param userAccount The user account to be banned and removed from the system.
+     */
     public void adminBanUser(AdminAccount adminAccount, UserAccount userAccount) {
         threadPool.submit(() -> {
             userSystem.getUserAccounts().remove(userAccount);
@@ -181,11 +296,12 @@ public class UserSystemController {
         });
     }
 
+    /**
+     * Retrieves the last post ID from the database.
+     *
+     * @return the ID of the most recently added post, or 1 if no posts exist.
+     */
     public int getLastPostId() {
-//        if (userSystem.getAllPosts().isEmpty()) {
-////            return 1;
-////        }
-////        return userSystem.getAllPosts().getLast().getId();
         threadPool.submit(() -> {
             String sql = "SELECT id FROM posts ORDER BY id DESC LIMIT 1";
             return DatabaseController.selectPostRecord(sql).getFirst().getId();
