@@ -14,7 +14,7 @@ public abstract class Report {
     private Date dateReported;
 
     public enum Status {
-        CREATED, ASSIGNED, PROCESSING, BLOCKED, CLOSED // TODO: Remove everything except CREATED and CLOSED?
+        OPENED, CLOSED
     }
 
     // Constructor for Report that handles all fields, this is used for fetching data from the database and
@@ -28,8 +28,6 @@ public abstract class Report {
     }
 
     public Report(int reportingUserId, Status status, String reason) {
-        nextId = ReportSystem.getInstance().getOpenReports().size() + 1;
-        this.id = nextId++;
         this.status = status;
         this.reason = reason;
         this.dateReported = new Date(System.currentTimeMillis());

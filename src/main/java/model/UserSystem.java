@@ -14,31 +14,21 @@ import java.util.List;
 @Setter
 @EqualsAndHashCode
 public class UserSystem {
+
+    @Getter
     private List<UserAccount> userAccounts;
+
+    private static UserSystem instance;
+    @Getter
     private UserAccount currentUser;
+    @Getter
     private List<Post> allPosts = DatabaseController.selectAllPosts();
 
-    /**
-     * A static instance of the UserSystem class implementing the Singleton pattern.
-     * This ensures there is only one instance of UserSystem throughout the application.
-     * The instance is initialized lazily and is thread-safe.
-     */
-    private static UserSystem instance;
-
-    /**
-     * Initializes a new instance of the UserSystem class.
-     * This constructor is private to enforce the Singleton design pattern.
-     * It initializes the userAccounts list by fetching all users from the database
-     * and sets the currentUser to null.
-     */
     private UserSystem() {
         this.userAccounts = DatabaseController.selectAllUsers();
         currentUser = null;
     }
 
-    /**
-     * Returns the singleton instance of the UserSystem class. If the instance
-     * does*/
     public static UserSystem getInstance() {
         if (instance == null) {
             synchronized (UserSystem.class) {
@@ -50,11 +40,6 @@ public class UserSystem {
         return instance;
     }
 
-    /**
-     * Authenticates a user by checking the provided username and password against stored user accounts.
-     * If authentication is successful, sets the current user to the authenticated user.
-     *
-     * @param username the username*/
     public boolean authenticateUser(String username, String password) {
         boolean success = false;
         for (UserAccount user : getInstance().userAccounts) {
@@ -67,22 +52,6 @@ public class UserSystem {
         return success;
     }
 
-    /**
-     * Checks if a user account with the*/
-    public boolean userAccountExists(String username) {
-        boolean exists = false;
-        for (UserAccount user : userAccounts) {
-            if (user.getUsername().equals(username)) {
-                exists = true;
-            }
-        }
-        return exists;
-    }
-
-    /**
-     * Retrieves a list of posts created by a specified user account.
-     *
-     * @param userAccount the user account whose*/
     public List<Post> getPostsByUser(UserAccount userAccount) {
         List<Post> posts = new ArrayList<>();
         for (Post post : allPosts) {
@@ -93,12 +62,19 @@ public class UserSystem {
         return posts;
     }
 
-    /**
-     **/
-    public String getUserById(int userId) {
+    public UserAccount getUserById(int userId) {
         for (UserAccount user : userAccounts) {
             if (user.getId() == userId) {
-                return user.getName();
+                return user;
+            }
+        }
+        return null;
+    }
+
+    public Post getPostById(int postId) {
+        for (Post post : allPosts) {
+            if (post.getId() == postId) {
+                return post;
             }
         }
         return null;

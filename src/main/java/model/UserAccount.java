@@ -65,7 +65,7 @@ public class UserAccount extends Account {
      * @param reason report reasoning
      */
     public UserReport reportAccount(UserAccount account, String reason) {
-        return new UserReport(account.getId(), Report.Status.CREATED, reason);
+        return new UserReport(account.getId(), Report.Status.OPENED, reason);
     }
 
     /**
@@ -74,6 +74,6 @@ public class UserAccount extends Account {
      * @param reason report reasoning
      */
     public PostReport reportPost(Post post, String reason) {
-        return new PostReport(post.getId(), Report.Status.CREATED, reason);
+        return new PostReport(this.getId(), Report.Status.OPENED, reason, post.getId());
     }
 }

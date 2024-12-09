@@ -151,7 +151,7 @@ public class UserInterfaceController {
         UserSystem.getInstance().getAllPosts().forEach(post -> {
             // Get the current date and time
             Date postDate = post.getDatePosted();
-            String username = UserSystem.getInstance().getUserById(post.getUserId());
+            String username = UserSystem.getInstance().getUserById(post.getUserId()).getUsername();
 
             String header = username + " - " + getFormattedDateTime(postDate);
             addPostToFeed(header, post.getText(), post);

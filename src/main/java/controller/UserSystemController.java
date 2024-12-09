@@ -215,7 +215,7 @@ public class UserSystemController {
                     post.getId());
             DatabaseController.insertRecord(sql);
 
-            ReportSystem.getInstance().getOpenReports().add(postReport);
+            ReportSystem.getInstance().getPostReports().add(postReport);
 //        });
 
     }
@@ -238,7 +238,8 @@ public class UserSystemController {
                 reporter.getId(),
                 target.getId());
         DatabaseController.insertRecord(sql);
-        ReportSystem.getInstance().getOpenReports().add(userReport);
+
+        ReportSystem.getInstance().getUserReports().add(userReport);
     }
 
     /**
