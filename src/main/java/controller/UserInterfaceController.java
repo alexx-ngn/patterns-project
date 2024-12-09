@@ -495,7 +495,7 @@ public class UserInterfaceController {
 
         // Follower count label
         ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
-        Label followersLabel = new Label(bundle.getString("followers") + user.getFollowerCount());
+        Label followersLabel = new Label(bundle.getString("followers") + ": " + user.getFollowerCount());
         followersLabel.setStyle("-fx-font-size: 16px;");
 
         // Follow button
@@ -665,7 +665,7 @@ public class UserInterfaceController {
         }
         Platform.runLater(() -> {
             ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
-            followersLabel.setText(bundle.getString("followers") + followed.getFollowerCount());
+            followersLabel.setText(bundle.getString("followers") + ": " + followed.getFollowerCount());
             followButton.setText(followOrUnfollow(followed));
         });
     }
@@ -680,9 +680,9 @@ public class UserInterfaceController {
     private String followOrUnfollow(UserAccount user) {
         ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
         if (user.getFollowerids().contains(UserSystem.getInstance().getCurrentUser().getId())) {
-            return bundle.getString("follow");
-        } else if (!user.getFollowerids().contains(UserSystem.getInstance().getCurrentUser().getId())) {
             return bundle.getString("unfollow");
+        } else if (!user.getFollowerids().contains(UserSystem.getInstance().getCurrentUser().getId())) {
+            return bundle.getString("follow");
         }
         return null;
     }
