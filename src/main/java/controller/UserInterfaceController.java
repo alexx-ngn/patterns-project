@@ -439,7 +439,7 @@ public class UserInterfaceController {
     private void handleLikeButton(Label counterLabel, Post post) {
         // Check if current user has liked already to then either like or dislike the post
         if (!post.getLikedByUserIds().contains(UserSystem.getInstance().getCurrentUser().getId())) {
-            UserSystemController.getInstance().userLikePost(UserSystem.getInstance().getCurrentUser(), post);
+            UserSystemController.getInstance().userLikePost(UserSystem.getInstance().getCurrentUser().getId(), post);
         } else if (post.getLikedByUserIds().contains(UserSystem.getInstance().getCurrentUser().getId())){
             UserSystemController.getInstance().userUnlikePost(UserSystem.getInstance().getCurrentUser(), post);
         }

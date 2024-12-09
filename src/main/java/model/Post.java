@@ -39,11 +39,7 @@ public class Post {
         this.datePosted = datePosted;
     }
 
-    public void like() {
-        likes++;
-    }
-
-    public void unlike() {
-        likes--;
+    public void likeUnlike() {
+        likes = likedByUserIds.size();
     }
 }

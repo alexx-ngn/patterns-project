@@ -71,18 +71,16 @@ public class UserSystemController {
         // });
     }
 
-    public void userLikePost(UserAccount userAccount, Post post) {
+    public void userLikePost(int userId, Post post) {
         // threadPool.submit(() -> { TODO: Prevention of user only liking post once only works without threadPool.submit()
         // Insert likes record
-        String insertSql = DatabaseController.generateFullInsertStatement("likes", userAccount.getId(), post.getId());
+        String insertSql = DatabaseController.generateFullInsertStatement("likes", userId, post.getId());
         DatabaseController.insertRecord(insertSql);
         System.out.println(insertSql);
 
         // Update properties of the post
         post.setLikedByUserIds(DatabaseController.selectAllUserLikesFromPost(post));
-        post.like();
-        System.out.println("userLikePost, post.likes: " + post.getLikes());
-        System.out.println("userLikePost, post.likedbyidsize: " + post.getLikedByUserIds().size());
+        post.likeUnlike();
 
         // Update numLikes column of post record
         String updateSql = DatabaseController.generateUpdateStatement("posts", "numLikes", post.getLikedByUserIds().size(), "id", post.getId());
@@ -93,15 +91,13 @@ public class UserSystemController {
     public void userUnlikePost(UserAccount userAccount, Post post) {
         // threadPool.submit(() -> {
         // Remove likes record
-        String sql = DatabaseController.generateDeleteStatement("likes", "userId", post.getUserId(), "postId", post.getId());
+        String sql = DatabaseController.generateDeleteStatement("likes", "userId", userAccount.getId(), "postId", post.getId());
         System.out.println(sql);
         DatabaseController.deleteRecord(sql);
 
         // Update properties of the post
         post.setLikedByUserIds(DatabaseController.selectAllUserLikesFromPost(post));
-        post.unlike();
-        System.out.println("userLikePost, post.likes: " + post.getLikes());
-        System.out.println("userLikePost, post.likedbyidsize: " + post.getLikedByUserIds().size());
+        post.likeUnlike();
 
         // Update numLikes column of post record
         String updateSql = DatabaseController.generateUpdateStatement("posts", "numLikes", post.getLikedByUserIds().size(), "id", post.getId());
