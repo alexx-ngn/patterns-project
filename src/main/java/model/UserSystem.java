@@ -52,6 +52,16 @@ public class UserSystem {
         return success;
     }
 
+    public boolean userAccountExists(String username) {
+        boolean exists = false;
+        for (UserAccount user : userAccounts) {
+            if (user.getUsername().equals(username)) {
+                exists = true;
+            }
+        }
+        return exists;
+    }
+
     public List<Post> getPostsByUser(UserAccount userAccount) {
         List<Post> posts = new ArrayList<>();
         for (Post post : allPosts) {
