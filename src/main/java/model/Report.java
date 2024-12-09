@@ -32,7 +32,6 @@ public abstract class Report {
         this.reason = reason;
         this.dateReported = new Date(System.currentTimeMillis());
         this.reportingUserId = reportingUserId;
-        // TODO: adminId assigned in another method, Report.assignAdmin method ??
         // id, dateReported, handled in database
     }
 }

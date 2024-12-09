@@ -2,7 +2,6 @@ package model;
 
 import lombok.*;
 
-import java.sql.Date;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -23,33 +22,42 @@ public class AdminAccount extends Account {
         this.assignedReports = new LinkedList<>();
     }
 
-    @Override
-    public void removePost(Post post) {
-        // TODO: not needed? Because all that must be done is for the post to be removed from UserSystem an DB,
-        //  so admin doesn't really have to do anything
-    }
-
+    /**
+     * Removes a specified report from the list of assigned reports.
+     *
+     * @param report the report to be removed from the assigned reports queue
+     */
     public void removeReport(Report report) {
         assignedReports.remove(report);
     }
 
-    public void ban(UserAccount account) {
-        // TODO: again all is done thru UserSystemeController so idk man
-    }
-
-    public void fetchNewReport(Report report) {
-        // TODO: I don't think we need this method because everything is done through GUI for admin,
-    }
-
+    /**
+     * Changes the status of the specified report to the given status.
+     *
+     * @param report the report whose status is to be changed
+     * @param status the new status to be set for the report
+     */
     public void changeReportStatus(Report report, Report.Status status) {
         report.setStatus(status);
     }
 
+    /**
+     * Assigns a report from the current admin account to another specified admin account.
+     *
+     * @param admin The AdminAccount to which the report is assigned.
+     * @param report The Report to be assigned.
+     */
     public void assignReportTo(AdminAccount admin, Report report) {
         assignedReports.remove(report);
         admin.getAssignedReports().add(report);
     }
 
+    /**
+     * Closes the specified report by changing its status to CLOSED and
+     * removing it from the list of assigned reports.
+     *
+     * @param report the report to be closed
+     */
     public void closeReport(Report report) {
         changeReportStatus(report, Report.Status.CLOSED);
         removeReport(report);

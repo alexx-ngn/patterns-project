@@ -1,8 +1,6 @@
 package model;
 import lombok.*;
 
-import java.sql.Date;
-
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -30,12 +28,4 @@ public abstract class Account {
         this.password = password;
         // id and creationDate handled in database
     }
-
-    /**
-     * depending on user removing post it differs:
-     * regular user: can only remove own posts
-     * admin: can remove any post
-     * @param post post to remove
-     */
-    public abstract void removePost(Post post);
 }

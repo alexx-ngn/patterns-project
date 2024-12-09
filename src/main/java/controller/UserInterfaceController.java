@@ -1,10 +1,8 @@
 package controller;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -16,7 +14,6 @@ import model.UserAccount;
 import model.UserSystem;
 import view.LoginInterface;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -79,26 +76,11 @@ public class UserInterfaceController {
      * Represents the locale settings used by the UserInterfaceController to
      * localize and update the user interface text according to the specified
      * language and region.
-     *
      * The locale is critical in determining the ResourceBundle that is loaded
      * to fetch the correct localized strings for various UI components like
      * labels and buttons.
      */
     private Locale locale;
-
-
-    /**
-     * Sets the locale for the user interface and updates all labels accordingly.
-     * This method changes the language or region settings, which adjusts the text labels
-     * in the application to the appropriate language defined by the given locale.
-     *
-     * @param locale the Locale to be set for the application, which determines the language
-     *               and regional settings for the user interface text elements.
-     */
-    public void setLocale(Locale locale) {
-        this.locale = locale;
-        updateLabels();
-    }
 
     /**
      * Updates the text labels and buttons in the user interface to reflect the current locale settings.
@@ -135,7 +117,6 @@ public class UserInterfaceController {
 
     /**
      * Loads and displays the user's feed with posts from all users.
-     *
      * This method clears the existing feed display by removing all children
      * nodes that are instances of VBox from feedVBox. It retrieves all posts
      * from the UserSystem's singleton instance and processes each post to
@@ -173,7 +154,6 @@ public class UserInterfaceController {
     /**
      * Loads the current user's profile by clearing existing posts from the profile view
      * and adding the user's posts from the system to the profile VBox.
-     *
      * The method first removes any nodes of type VBox from the profileVBox, ensuring
      * that the view is cleared before new posts are loaded.
      * It then retrieves the current user from the UserSystem singleton instance
@@ -225,7 +205,6 @@ public class UserInterfaceController {
     /**
      * Initializes the user interface components and settings for the application.
      * This method is automatically called when the FXML file is loaded.
-     *
      * The following operations are performed during initialization:
      * 1. Sets the locale for the application if it has not been previously set.
      * 2. Loads the feed content into the user interface.
@@ -250,7 +229,6 @@ public class UserInterfaceController {
      * Handles the action event triggered by clicking the "Post" button in the user interface.
      * This method opens a dialog for the user to input a post. If the input is not empty,
      * it processes and posts the content using the current user's account.
-     *
      * The method performs the following actions:
      * 1. Presents a `TextInputDialog` with a title and header fetched from resource bundles
      *    to accommodate locale-specific language settings.
@@ -288,7 +266,7 @@ public class UserInterfaceController {
      * in a VBox and adds it to the user interface. The post includes a header, content, and a set of
      * reaction controls such as like and report buttons.
      *
-     * @param headerText The text to be displayed in the header of the post. Typically includes the
+     * @param headerText The text to be displayed in the header of the post. Typically, includes the
      *                   username and the date/time the post was made.
      * @param postContent The content of the post to be displayed.
      * @param post The Post object containing data about likes and other metadata.
@@ -516,13 +494,14 @@ public class UserInterfaceController {
         usernameLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         // Follower count label
-        Label followersLabel = new Label("Followers: " + user.getFollowerCount());
+        ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
+        Label followersLabel = new Label(bundle.getString("followers") + user.getFollowerCount());
         followersLabel.setStyle("-fx-font-size: 16px;");
 
         // Follow button
         Button followButton = new Button(followOrUnfollow(user));
         followButton.setPrefWidth(80);
-        followButton.setOnAction(e -> handleFollowButton(followersLabel, followButton, user));
+        followButton.setOnAction(event -> handleFollowButton(followersLabel, followButton, user));
 
         headerLayout.getChildren().addAll(usernameLabel, followButton, spacer, followersLabel);
 
@@ -592,7 +571,7 @@ public class UserInterfaceController {
      * It first clears any existing search results by removing HBox nodes from
      * the searchVBox. Then, it iterates through all user accounts retrieved
      * from the UserSystem singleton instance. For each user, if the username
-     * contains the text entered in the searchTextField, the user profile is
+     * contains the text entered the searchTextField, the user profile is
      * added to the search results using the private method addProfilesToSearch.
      */
     @FXML
@@ -685,7 +664,8 @@ public class UserInterfaceController {
             UserSystemController.getInstance().userUnfollowUser(UserSystem.getInstance().getCurrentUser(), followed);
         }
         Platform.runLater(() -> {
-            followersLabel.setText("Followers:" + followed.getFollowerCount());
+            ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
+            followersLabel.setText(bundle.getString("followers") + followed.getFollowerCount());
             followButton.setText(followOrUnfollow(followed));
         });
     }
@@ -698,10 +678,11 @@ public class UserInterfaceController {
      *  met
      */
     private String followOrUnfollow(UserAccount user) {
+        ResourceBundle bundle = ResourceBundle.getBundle("lang.User", locale);
         if (user.getFollowerids().contains(UserSystem.getInstance().getCurrentUser().getId())) {
-            return "Unfollow";
+            return bundle.getString("follow");
         } else if (!user.getFollowerids().contains(UserSystem.getInstance().getCurrentUser().getId())) {
-            return "Follow";
+            return bundle.getString("unfollow");
         }
         return null;
     }

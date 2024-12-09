@@ -1,6 +1,5 @@
 package model;
 
-import controller.UserSystemController;
 import lombok.*;
 
 import java.util.Date;
